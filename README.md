@@ -1,0 +1,1 @@
+An expanded personal expenses manager desktop application. This time written in c# with the help of windows forms.
