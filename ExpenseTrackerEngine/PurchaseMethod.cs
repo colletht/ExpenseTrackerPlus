@@ -1,4 +1,4 @@
-﻿// <copyright file="Class1.cs" company="Harrison Collet">
+﻿// <copyright file="PurchaseMethod.cs" company="Harrison Collet">
 // Copyright (c) Harrison Collet. All rights reserved.
 // </copyright>
 
@@ -11,9 +11,9 @@ namespace ExpenseTrackerEngine
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Placeholder Class.
+    /// Abstract purchase method class for representing purchase methods.
     /// </summary>
-    public class Class1
+    public abstract class PurchaseMethod
     {
     }
 }

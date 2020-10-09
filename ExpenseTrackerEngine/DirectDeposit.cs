@@ -1,0 +1,78 @@
+﻿// <copyright file="DirectDeposit.cs" company="Harrison Collet">
+// Copyright (c) Harrison Collet. All rights reserved.
+// </copyright>
+
+namespace ExpenseTrackerEngine
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// Models a Direct Deposit method of purchase.
+    /// </summary>
+    public class DirectDeposit : PurchaseMethod
+    {
+        private bool savings;
+        private string bankName;
+        private int number;
+        private string name;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DirectDeposit"/> class.
+        /// </summary>
+        /// <param name="savings">Represents if the accound is savings or not.</param>
+        /// <param name="bankName">The name of the bank the account is under.</param>
+        /// <param name="number">The abbreviated six digit account number.</param>
+        /// <param name="name">The name the account is under.</param>
+        public DirectDeposit(
+            bool savings = false,
+            string bankName = "Bank of America",
+            int number = 123456,
+            string name = "John Doe")
+        {
+            this.savings = savings;
+            this.bankName = bankName;
+            this.number = number;
+            this.name = name;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether represents if the accound is savings or not.
+        /// </summary>
+        public bool Savings
+        {
+            get { return this.savings; }
+            set { this.savings = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the bank the account is under.
+        /// </summary>
+        public string BankName
+        {
+            get { return this.bankName; }
+            set { this.bankName = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the abbreviated six digit account number.
+        /// </summary>
+        public int Number
+        {
+            get { return this.number; }
+            set { this.number = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the name the account is under.
+        /// </summary>
+        public string Name
+        {
+            get { return this.name; }
+            set { this.name = value; }
+        }
+    }
+}
