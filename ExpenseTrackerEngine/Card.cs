@@ -74,5 +74,44 @@ namespace ExpenseTrackerEngine
             get { return this.name; }
             set { this.name = value; }
         }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            Card c = (Card)obj;
+            return (this.Debit == c.Debit) &&
+                (this.Provider == c.Provider) &&
+                (this.Number == c.Number) &&
+                (this.Name == c.Name);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            // code retrieved from: https://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-overriding-gethashcode
+            unchecked
+            {
+                // Overflow is fine, just wrap
+                int hash = 17;
+
+                // Suitable nullity checks etc, of course :)
+                hash = (hash * 23) + this.Provider.GetHashCode();
+                hash = (hash * 23) + this.Debit.GetHashCode();
+                hash = (hash * 23) + this.Number.GetHashCode();
+                hash = (hash * 23) + this.Name.GetHashCode();
+                return hash;
+            }
+        }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return string.Format(
+                "{0} {1} Card: {2} Cardholder: {3}",
+                this.Provider,
+                this.Debit ? "Debit" : "Credit",
+                this.Number,
+                this.Name);
+        }
     }
 }

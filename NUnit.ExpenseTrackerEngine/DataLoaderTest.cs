@@ -2,8 +2,6 @@
 // Copyright (c) Harrison Collet. All rights reserved.
 // </copyright>
 
-//TODO: Iimplement expense filter and thusly allow for searching of db. perhaps find solution to injection attacks.
-
 namespace NUnit.ExpenseTrackerEngineTest
 {
     using System;

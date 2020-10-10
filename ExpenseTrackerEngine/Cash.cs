@@ -36,9 +36,31 @@ namespace ExpenseTrackerEngine
         }
 
         /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            Cash c = (Cash)obj;
+            return this.Currency == c.Currency;
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            // code retrieved from: https://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-overriding-gethashcode
+            unchecked
+            {
+                // Overflow is fine, just wrap
+                int hash = 17;
+
+                // Suitable nullity checks etc, of course :)
+                hash = (hash * 23) + this.Currency.GetHashCode();
+                return hash;
+            }
+        }
+
+        /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Format("Method: Cash, Currency: {0}", this.currency);
+            return string.Format("Cash: {0}", this.currency);
         }
     }
 }

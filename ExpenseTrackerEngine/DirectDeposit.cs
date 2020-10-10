@@ -74,5 +74,44 @@ namespace ExpenseTrackerEngine
             get { return this.name; }
             set { this.name = value; }
         }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            DirectDeposit d = (DirectDeposit)obj;
+            return (this.Savings == d.Savings) &&
+                (this.BankName == d.BankName) &&
+                (this.Number == d.Number) &&
+                (this.Name == d.Name);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            // code retrieved from: https://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-overriding-gethashcode
+            unchecked
+            {
+                // Overflow is fine, just wrap
+                int hash = 17;
+
+                // Suitable nullity checks etc, of course :)
+                hash = (hash * 23) + this.Savings.GetHashCode();
+                hash = (hash * 23) + this.BankName.GetHashCode();
+                hash = (hash * 23) + this.Number.GetHashCode();
+                hash = (hash * 23) + this.Name.GetHashCode();
+                return hash;
+            }
+        }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return string.Format(
+                "Direct Deposit {0} Account {1} at {2}: Owned by: {3}",
+                this.Savings ? "Savings" : "Checking",
+                this.Number,
+                this.BankName,
+                this.Name);
+        }
     }
 }
