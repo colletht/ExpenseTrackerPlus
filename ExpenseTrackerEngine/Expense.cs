@@ -34,16 +34,42 @@ namespace ExpenseTrackerEngine
         /// <param name="method">Information about how expense was incurred.</param>
         /// <param name="tag">Tags categorizing expense.</param>
         /// <param name="notes">Other miscellaneous information.</param>
-        public Expense(
-            float value = 0.0f,
-            DateTime date = default(DateTime),
-            string place = "",
-            PurchaseMethod method = default(Cash),
-            HashSet<string> tag = null,
-            string notes = "",
-            int id = -1)
+        internal Expense(
+            int id,
+            float value,
+            DateTime date,
+            string place,
+            PurchaseMethod method,
+            HashSet<string> tag,
+            string notes)
         {
             this.id = id;
+            this.value = value;
+            this.date = date;
+            this.place = place;
+            this.purchaseMethod = method;
+            this.tag = tag ?? new HashSet<string>();
+            this.notes = notes;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Expense"/> class.
+        /// </summary>
+        /// <param name="value">The monetary value of the currency.</param>
+        /// <param name="date">Date the expense was incurred.</param>
+        /// <param name="place">Place expense was incurred.</param>
+        /// <param name="method">Information about how expense was incurred.</param>
+        /// <param name="tag">Tags categorizing expense.</param>
+        /// <param name="notes">Other miscellaneous information.</param>
+        public Expense(
+            float value,
+            DateTime date,
+            string place,
+            PurchaseMethod method,
+            HashSet<string> tag,
+            string notes)
+        {
+            this.id = -1;
             this.value = value;
             this.date = date;
             this.place = place;
@@ -129,6 +155,53 @@ namespace ExpenseTrackerEngine
         public void RemoveTag(string tagToRemove)
         {
             this.tag.Remove(tagToRemove);
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            Expense e = (Expense)obj;
+            return (this.Value == e.Value) &&
+                (this.Date == e.Date) &&
+                (this.Place == e.Place) &&
+                this.Tag.SetEquals(e.Tag) &&
+                this.Method.Equals(e.Method) &&
+                (this.Notes == e.Notes);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            // code retrieved from: https://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-overriding-gethashcode
+            unchecked
+            {
+                // Overflow is fine, just wrap
+                int hash = 17;
+
+                // Suitable nullity checks etc, of course :)
+                hash = (hash * 23) + this.Value.GetHashCode();
+                hash = (hash * 23) + this.Date.GetHashCode();
+                hash = (hash * 23) + this.Place.GetHashCode();
+                hash = (hash * 23) + this.Tag.GetHashCode();
+                hash = (hash * 23) + this.Notes.GetHashCode();
+                hash = (hash * 23) + this.Method.GetHashCode();
+                return hash;
+            }
+        }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            string outstring = string.Format(
+                "Expense: {0}, {1}, {2}, ({3}), {4}, {5}",
+                this.Value,
+                this.Date,
+                this.Place,
+                this.Method,
+                string.Join("|", this.Tag),
+                this.Notes);
+
+            return outstring;
         }
     }
 }
