@@ -6,13 +6,13 @@ namespace ExpenseTrackerEngine
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.SQLite;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Microsoft.Data.Sqlite;
 
     /// <summary>
-    /// Represents one expense within the context of this application. Encapsulates data returned from the SQLite db.
+    /// Represents one expense within the context of this application. Encapsulates data returned from the Sqlite db.
     /// </summary>
     public class Expense
     {
@@ -23,6 +23,32 @@ namespace ExpenseTrackerEngine
         private PurchaseMethod purchaseMethod;
         private HashSet<string> tag;
         private string notes;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Expense"/> class.
+        /// </summary>
+        /// <param name="value">The monetary value of the currency.</param>
+        /// <param name="date">Date the expense was incurred.</param>
+        /// <param name="place">Place expense was incurred.</param>
+        /// <param name="method">Information about how expense was incurred.</param>
+        /// <param name="tag">Tags categorizing expense.</param>
+        /// <param name="notes">Other miscellaneous information.</param>
+        public Expense(
+            float value,
+            DateTime date,
+            string place,
+            PurchaseMethod method,
+            HashSet<string> tag,
+            string notes)
+        {
+            this.id = -1;
+            this.value = value;
+            this.date = date;
+            this.place = place;
+            this.purchaseMethod = method;
+            this.tag = tag ?? new HashSet<string>();
+            this.notes = notes;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Expense"/> class.
@@ -44,32 +70,6 @@ namespace ExpenseTrackerEngine
             string notes)
         {
             this.id = id;
-            this.value = value;
-            this.date = date;
-            this.place = place;
-            this.purchaseMethod = method;
-            this.tag = tag ?? new HashSet<string>();
-            this.notes = notes;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Expense"/> class.
-        /// </summary>
-        /// <param name="value">The monetary value of the currency.</param>
-        /// <param name="date">Date the expense was incurred.</param>
-        /// <param name="place">Place expense was incurred.</param>
-        /// <param name="method">Information about how expense was incurred.</param>
-        /// <param name="tag">Tags categorizing expense.</param>
-        /// <param name="notes">Other miscellaneous information.</param>
-        public Expense(
-            float value,
-            DateTime date,
-            string place,
-            PurchaseMethod method,
-            HashSet<string> tag,
-            string notes)
-        {
-            this.id = -1;
             this.value = value;
             this.date = date;
             this.place = place;

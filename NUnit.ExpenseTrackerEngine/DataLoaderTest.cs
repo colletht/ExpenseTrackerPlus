@@ -2,23 +2,22 @@
 // Copyright (c) Harrison Collet. All rights reserved.
 // </copyright>
 
-
-// TODO: Try encrypting data wiht passowrd - https://web.archive.org/web/20100207030625/http://sqlite.phxsoftware.com/forums/t/130.aspx
+// TODO: Try encrypting data wiht passowrd - https://web.archive.org/web/20100207030625/http://Sqlite.phxsoftware.com/forums/t/130.aspx
 // research what encryption standard is used here
-//https://www.sqlite.org/see/doc/release/www/readme.wiki
+// https://www.Sqlite.org/see/doc/release/www/readme.wiki
 namespace NUnit.ExpenseTrackerEngineTest
 {
     using System;
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
-    using System.Data.SQLite;
     using System.IO;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
     using System.Threading.Tasks;
     using ExpenseTrackerEngine;
+    using Microsoft.Data.Sqlite;
     using NUnit.Framework;
 
     /// <summary>
@@ -27,10 +26,10 @@ namespace NUnit.ExpenseTrackerEngineTest
     [TestFixture]
     public class DataLoaderTest
     {
-        private const string dbName = "myDatabase";
-        private const string tableName = "myTable";
+        private const string DBNAME = "myDatabase";
+        private const string TABLENAME = "myTable";
         private DataAccessFactory dataAccessFactory;
-        private SQLiteConnection db;
+        private SqliteConnection db;
 
         /// <summary>
         /// Sets up testing assets.
@@ -40,8 +39,7 @@ namespace NUnit.ExpenseTrackerEngineTest
         {
             File.Delete("./myDatabase.db");
             Console.WriteLine("Here in one time Setup");
-            this.dataAccessFactory = new DataAccessFactory(dbName, tableName);
-            this.dataAccessFactory.CreateFile();
+            this.dataAccessFactory = new DataAccessFactory(DBNAME, TABLENAME);
         }
 
         /// <summary>
@@ -55,22 +53,6 @@ namespace NUnit.ExpenseTrackerEngineTest
         }
 
         /// <summary>
-        /// Tests the create file function of DataLoader.
-        /// </summary>
-        [Test]
-        public void CreateFileTest()
-        {
-            DataAccessFactory factory = new DataAccessFactory("testFile2", "myTable");
-            File.Delete("./testFile2.db");
-
-            Assert.That(factory.CreateFile(), Is.True);
-            Assert.That(File.Exists("./testFile2.db"), Is.True);
-            Assert.That(factory.CreateFile(), Is.False);
-
-            File.Delete("./testFile2.db");
-        }
-
-        /// <summary>
         /// Tests the create connection function of the data loader under succesful inputs.
         /// </summary>
         [Test]
@@ -78,10 +60,9 @@ namespace NUnit.ExpenseTrackerEngineTest
         {
             DataAccessFactory factory = new DataAccessFactory("testFile1", "myTable");
             File.Delete("./testFile1.db");
-            SQLiteConnection.CreateFile("./testFile1.db");
 
             // Use a seperate connection so we can use the other connection for testing the rest of the functions.
-            SQLiteConnection conn = factory.CreateConnection();
+            SqliteConnection conn = factory.CreateConnection();
             Assert.That(conn, Is.Not.Null);
             Assert.That(factory.CloseConnection(conn), Is.True);
 
@@ -103,27 +84,27 @@ namespace NUnit.ExpenseTrackerEngineTest
         [Test]
         public void CreateNewExpenseTableTest()
         {
-            string[] COLUMNS = { "Id", "Value", "Date", "Place", "Tag", "Notes", "Type", "Debit", "Provider", "Number", "Name", "Currency", "Savings", "Bankname" };
-            string[] TYPES = { "INTEGER", "DECIMAL", "DATETIME", "VARCHAR(50)", "VARCHAR(200)", "VARCHAR(200)", "INTEGER", "INTEGER", "VARCHAR(20)", "INTEGER", "VARCHAR(100)", "VARCHAR(20)", "INTEGER", "VARCHAR(50)" };
+            string[] columns = { "Id", "Value", "Date", "Place", "Tag", "Notes", "Type", "Debit", "Provider", "Number", "Name", "Currency", "Savings", "Bankname" };
+            string[] types = { "INTEGER", "DECIMAL", "DATETIME", "VARCHAR(50)", "VARCHAR(200)", "VARCHAR(200)", "INTEGER", "INTEGER", "VARCHAR(20)", "INTEGER", "VARCHAR(100)", "VARCHAR(20)", "INTEGER", "VARCHAR(50)" };
             int i = 0;
 
             this.db = this.dataAccessFactory.CreateConnection();
             this.dataAccessFactory.CreateNewExpenseTable(this.db);
 
             // verify columns created correctly
-            SQLiteCommand cmd = this.db.CreateCommand();
-            cmd.CommandText = string.Format("PRAGMA table_info({0});", tableName);
-            SQLiteDataReader res = cmd.ExecuteReader();
+            SqliteCommand cmd = this.db.CreateCommand();
+            cmd.CommandText = string.Format("PRAGMA table_info({0});", TABLENAME);
+            SqliteDataReader res = cmd.ExecuteReader();
             while (res.Read())
             {
                 Console.WriteLine($"{res.GetString(1),-8} {res.GetString(2),-8}");
                 Assert.That(
                     res.GetString(1),
-                    Is.EqualTo(COLUMNS[i]),
+                    Is.EqualTo(columns[i]),
                     string.Format("Row: {0}", i));  // check that column names are correct
                 Assert.That(
                     res.GetString(2),
-                    Is.EqualTo(TYPES[i]),
+                    Is.EqualTo(types[i]),
                     string.Format("Row: {0}", i));    // check that column types are correct
                 ++i;
             }
@@ -169,11 +150,11 @@ namespace NUnit.ExpenseTrackerEngineTest
             this.dataAccessFactory.InsertRecord(this.db, e);
 
             // verify columns created correctly
-            using (SQLiteCommand cmd = this.db.CreateCommand())
+            using (SqliteCommand cmd = this.db.CreateCommand())
             {
-                cmd.CommandText = string.Format("SELECT * FROM {0};", tableName);
+                cmd.CommandText = string.Format("SELECT * FROM {0};", TABLENAME);
 
-                using (SQLiteDataReader res = cmd.ExecuteReader())
+                using (SqliteDataReader res = cmd.ExecuteReader())
                 {
                     while (res.Read())
                     {
@@ -198,9 +179,9 @@ namespace NUnit.ExpenseTrackerEngineTest
             }
 
             // Clean table of all entries for consecutive runs
-            using (SQLiteCommand cmd = this.db.CreateCommand())
+            using (SqliteCommand cmd = this.db.CreateCommand())
             {
-                cmd.CommandText = string.Format("DROP TABLE {0};", tableName);
+                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -247,11 +228,11 @@ namespace NUnit.ExpenseTrackerEngineTest
             this.dataAccessFactory.UpdateRecord(this.db, e);
 
             // verify columns created correctly
-            using (SQLiteCommand cmd = this.db.CreateCommand())
+            using (SqliteCommand cmd = this.db.CreateCommand())
             {
-                cmd.CommandText = string.Format("SELECT * FROM {0};", tableName);
+                cmd.CommandText = string.Format("SELECT * FROM {0};", TABLENAME);
 
-                using (SQLiteDataReader res = cmd.ExecuteReader())
+                using (SqliteDataReader res = cmd.ExecuteReader())
                 {
                     while (res.Read())
                     {
@@ -276,9 +257,9 @@ namespace NUnit.ExpenseTrackerEngineTest
             }
 
             // Clean table of all entries for consecutive runs
-            using (SQLiteCommand cmd = this.db.CreateCommand())
+            using (SqliteCommand cmd = this.db.CreateCommand())
             {
-                cmd.CommandText = string.Format("DROP TABLE {0};", tableName);
+                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -315,11 +296,11 @@ namespace NUnit.ExpenseTrackerEngineTest
             this.dataAccessFactory.DeleteRecord(this.db, 1);
 
             // verify columns created correctly
-            using (SQLiteCommand cmd = this.db.CreateCommand())
+            using (SqliteCommand cmd = this.db.CreateCommand())
             {
-                cmd.CommandText = string.Format("SELECT count(*) FROM {0};", tableName);
+                cmd.CommandText = string.Format("SELECT count(*) FROM {0};", TABLENAME);
 
-                using (SQLiteDataReader res = cmd.ExecuteReader())
+                using (SqliteDataReader res = cmd.ExecuteReader())
                 {
                     while (res.Read())
                     {
@@ -331,9 +312,9 @@ namespace NUnit.ExpenseTrackerEngineTest
             }
 
             // Clean table of all entries for consecutive runs
-            using (SQLiteCommand cmd = this.db.CreateCommand())
+            using (SqliteCommand cmd = this.db.CreateCommand())
             {
-                cmd.CommandText = string.Format("DROP TABLE {0};", tableName);
+                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -377,9 +358,9 @@ namespace NUnit.ExpenseTrackerEngineTest
             }
 
             // Clean table of all entries for consecutive runs
-            using (SQLiteCommand cmd = this.db.CreateCommand())
+            using (SqliteCommand cmd = this.db.CreateCommand())
             {
-                cmd.CommandText = string.Format("DROP TABLE {0};", tableName);
+                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -453,9 +434,9 @@ namespace NUnit.ExpenseTrackerEngineTest
             Assert.AreEqual(e1, result);    // Since both e1 and e2 match they should be sorted ascendingly by id, since e1 was inserted first it should have a lower id and thus be selected over e2
 
             // Clean table of all entries for consecutive runs
-            using (SQLiteCommand cmd = this.db.CreateCommand())
+            using (SqliteCommand cmd = this.db.CreateCommand())
             {
-                cmd.CommandText = string.Format("DROP TABLE {0};", tableName);
+                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -530,9 +511,9 @@ namespace NUnit.ExpenseTrackerEngineTest
             Assert.AreEqual(e2, result[1]);
 
             // Clean table of all entries for consecutive runs
-            using (SQLiteCommand cmd = this.db.CreateCommand())
+            using (SqliteCommand cmd = this.db.CreateCommand())
             {
-                cmd.CommandText = string.Format("DROP TABLE {0};", tableName);
+                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -557,7 +538,7 @@ namespace NUnit.ExpenseTrackerEngineTest
             File.Delete("./myDatabase.db");
         }
 
-        private string StringifyDataRow(SQLiteDataReader res)
+        private string StringifyDataRow(SqliteDataReader res)
         {
             return $@"{res.GetInt32(0),-3} {res.GetDecimal(1),-8} {res.GetDateTime(2),8} {res.GetString(3),8} {res.GetString(4),20} {res.GetString(5),10} {res.GetInt32(6),3} {res.GetValue(7),3} {res.GetValue(8),22} {res.GetValue(8),22} {res.GetValue(9),6} {res.GetValue(10),10} {res.GetValue(11),5} {res.GetValue(12),3} {res.GetValue(13),10}";
         }
