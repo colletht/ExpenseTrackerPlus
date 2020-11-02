@@ -6,7 +6,10 @@ namespace ExpenseTrackerEngine
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Runtime.Remoting.Channels;
     using System.Text;
     using System.Threading.Tasks;
     using Microsoft.Data.Sqlite;
@@ -15,6 +18,7 @@ namespace ExpenseTrackerEngine
     /// Represents one expense within the context of this application. Encapsulates data returned from the Sqlite db.
     /// </summary>
     public class Expense
+        : INotifyPropertyChanged
     {
         private int id;
         private float value;
@@ -78,6 +82,9 @@ namespace ExpenseTrackerEngine
             this.notes = notes;
         }
 
+        /// <inheritdoc/>
+        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+
         /// <summary>
         /// Gets id of expense in db. -1 if not yet present in db.
         /// </summary>
@@ -91,8 +98,16 @@ namespace ExpenseTrackerEngine
         /// </summary>
         public float Value
         {
-            get { return this.value; }
-            set { this.value = value; }
+            get
+            {
+                return this.value;
+            }
+
+            set
+            {
+                this.value = value;
+                this.NotifyPropertyChanged();
+            }
         }
 
         /// <summary>
@@ -100,8 +115,16 @@ namespace ExpenseTrackerEngine
         /// </summary>
         public DateTime Date
         {
-            get { return this.date; }
-            set { this.date = value; }
+            get
+            {
+                return this.date;
+            }
+
+            set
+            {
+                this.date = value;
+                this.NotifyPropertyChanged();
+            }
         }
 
         /// <summary>
@@ -109,8 +132,16 @@ namespace ExpenseTrackerEngine
         /// </summary>
         public string Place
         {
-            get { return this.place; }
-            set { this.place = value; }
+            get
+            {
+                return this.place;
+            }
+
+            set
+            {
+                this.place = value;
+                this.NotifyPropertyChanged();
+            }
         }
 
         /// <summary>
@@ -118,8 +149,16 @@ namespace ExpenseTrackerEngine
         /// </summary>
         public PurchaseMethod Method
         {
-            get { return this.purchaseMethod; }
-            set { this.purchaseMethod = value; }
+            get
+            {
+                return this.purchaseMethod;
+            }
+
+            set
+            {
+                this.purchaseMethod = value;
+                this.NotifyPropertyChanged();
+            }
         }
 
         /// <summary>
@@ -127,8 +166,16 @@ namespace ExpenseTrackerEngine
         /// </summary>
         public string Notes
         {
-            get { return this.notes; }
-            set { this.notes = value; }
+            get
+            {
+                return this.notes;
+            }
+
+            set
+            {
+                this.notes = value;
+                this.NotifyPropertyChanged();
+            }
         }
 
         /// <summary>
@@ -146,6 +193,7 @@ namespace ExpenseTrackerEngine
         public void AddTag(string newTag)
         {
             this.tag.Add(newTag);
+            this.NotifyPropertyChanged(nameof(this.Tag));
         }
 
         /// <summary>
@@ -155,6 +203,7 @@ namespace ExpenseTrackerEngine
         public void RemoveTag(string tagToRemove)
         {
             this.tag.Remove(tagToRemove);
+            this.NotifyPropertyChanged(nameof(this.Tag));
         }
 
         /// <inheritdoc/>
@@ -202,6 +251,11 @@ namespace ExpenseTrackerEngine
                 this.Notes);
 
             return outstring;
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
