@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="DataLoaderTest.cs" />
     <Compile Include="ExpenseFilterTest.cs" />
+    <Compile Include="PasswordUtilityTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

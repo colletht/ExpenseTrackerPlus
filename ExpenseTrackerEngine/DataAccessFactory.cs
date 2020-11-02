@@ -2,7 +2,6 @@
 // Copyright (c) Harrison Collet. All rights reserved.
 // </copyright>
 
-// TODO: Implement parameterized SQL so as to protect against SQL injection attacks.
 namespace ExpenseTrackerEngine
 {
     using System;
