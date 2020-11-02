@@ -26,10 +26,9 @@ namespace NUnit.ExpenseTrackerEngineTest
     [TestFixture]
     public class DataLoaderTest
     {
-        private const string DBNAME = "myDatabase";
-        private const string TABLENAME = "myTable";
+        private const string TABLENAME = "Expenses";
+        private User testUser;
         private DataAccessFactory dataAccessFactory;
-        private SqliteConnection db;
 
         /// <summary>
         /// Sets up testing assets.
@@ -39,7 +38,8 @@ namespace NUnit.ExpenseTrackerEngineTest
         {
             File.Delete("./myDatabase.db");
             Console.WriteLine("Here in one time Setup");
-            this.dataAccessFactory = new DataAccessFactory(DBNAME, TABLENAME);
+            this.testUser = new User("testUser", "password", "mysupersecretkey", "myDatabase", "supersaltysalt");
+            this.dataAccessFactory = new DataAccessFactory(this.testUser);
         }
 
         /// <summary>
@@ -49,33 +49,6 @@ namespace NUnit.ExpenseTrackerEngineTest
         public void Setup()
         {
             Console.WriteLine("Here in Setup!");
-            this.db = this.dataAccessFactory.CreateConnection();
-        }
-
-        /// <summary>
-        /// Tests the create connection function of the data loader under succesful inputs.
-        /// </summary>
-        [Test]
-        public void CreateCloseConnectionSuccessTest()
-        {
-            DataAccessFactory factory = new DataAccessFactory("testFile1", "myTable");
-            File.Delete("./testFile1.db");
-
-            // Use a seperate connection so we can use the other connection for testing the rest of the functions.
-            SqliteConnection conn = factory.CreateConnection();
-            Assert.That(conn, Is.Not.Null);
-            Assert.That(factory.CloseConnection(conn), Is.True);
-
-            File.Delete("./testFile1.db");
-        }
-
-        /// <summary>
-        /// Tests the create connection function of the data loader under fail inputs.
-        /// </summary>
-        [Test]
-        public void CloseConnectionFailTest()
-        {
-            Assert.That(this.dataAccessFactory.CloseConnection(null), Is.False);
         }
 
         /// <summary>
@@ -88,37 +61,38 @@ namespace NUnit.ExpenseTrackerEngineTest
             string[] types = { "INTEGER", "DECIMAL", "DATETIME", "VARCHAR(50)", "VARCHAR(200)", "VARCHAR(200)", "INTEGER", "INTEGER", "VARCHAR(20)", "INTEGER", "VARCHAR(100)", "VARCHAR(20)", "INTEGER", "VARCHAR(50)" };
             int i = 0;
 
-            this.db = this.dataAccessFactory.CreateConnection();
-            this.dataAccessFactory.CreateNewExpenseTable(this.db);
+            this.dataAccessFactory.CreateNewExpenseTable();
 
             // verify columns created correctly
-            SqliteCommand cmd = this.db.CreateCommand();
-            cmd.CommandText = string.Format("PRAGMA table_info({0});", TABLENAME);
-            SqliteDataReader res = cmd.ExecuteReader();
-            while (res.Read())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                Console.WriteLine($"{res.GetString(1),-8} {res.GetString(2),-8}");
-                Assert.That(
-                    res.GetString(1),
-                    Is.EqualTo(columns[i]),
-                    string.Format("Row: {0}", i));  // check that column names are correct
-                Assert.That(
-                    res.GetString(2),
-                    Is.EqualTo(types[i]),
-                    string.Format("Row: {0}", i));    // check that column types are correct
-                ++i;
-            }
-        }
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format("PRAGMA table_info({0});", TABLENAME);
+                    SqliteDataReader res = cmd.ExecuteReader();
+                    while (res.Read())
+                    {
+                        Console.WriteLine($"{res.GetString(1),-8} {res.GetString(2),-8}");
+                        Assert.That(
+                            res.GetString(1),
+                            Is.EqualTo(columns[i]),
+                            string.Format("Row: {0}", i));  // check that column names are correct
+                        Assert.That(
+                            res.GetString(2),
+                            Is.EqualTo(types[i]),
+                            string.Format("Row: {0}", i));    // check that column types are correct
+                        ++i;
+                    }
+                }
 
-        /// <summary>
-        /// Tests that CreateNewExpenseTable handles incorrect connections being passed.
-        /// </summary>
-        [Test]
-        public void CreateNewExpenseTableNullTest()
-        {
-            Assert.Throws<Exception>(
-                () => this.dataAccessFactory.CreateNewExpenseTable(null),
-                "Does not throw on null connection");
+                // Clean table of all entries for consecutive runs
+                using (SqliteCommand cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
         /// <summary>
@@ -130,7 +104,7 @@ namespace NUnit.ExpenseTrackerEngineTest
             try
             {
                 // Create Table if it has not been created yet
-                this.dataAccessFactory.CreateNewExpenseTable(this.db);
+                this.dataAccessFactory.CreateNewExpenseTable();
             }
             catch
             {
@@ -147,42 +121,46 @@ namespace NUnit.ExpenseTrackerEngineTest
             e.AddTag("Food");
             e.AddTag("Hygene");
 
-            this.dataAccessFactory.InsertRecord(this.db, e);
+            this.dataAccessFactory.InsertRecord(e);
 
             // verify columns created correctly
-            using (SqliteCommand cmd = this.db.CreateCommand())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                cmd.CommandText = string.Format("SELECT * FROM {0};", TABLENAME);
-
-                using (SqliteDataReader res = cmd.ExecuteReader())
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
                 {
-                    while (res.Read())
+                    cmd.CommandText = string.Format("SELECT * FROM {0};", TABLENAME);
+
+                    using (SqliteDataReader res = cmd.ExecuteReader())
                     {
-                        Console.WriteLine(this.StringifyDataRow(res));
-                        Assert.AreEqual(1, res.GetInt32(0));                                            // Id
-                        Assert.AreEqual(e.Value, (float)res.GetDecimal(1));                             // Value
-                        Assert.AreEqual(e.Date, res.GetDateTime(2));                                    // Date
-                        Assert.AreEqual(e.Place, res.GetString(3));                                     // Place
-                        Assert.AreEqual(string.Join(":", e.Tag), res.GetString(4));                     // Tag
-                        Assert.AreEqual(e.Notes, res.GetString(5));                                     // Notes
-                        Assert.AreEqual((int)DataAccessFactory.EpurchaseMethod.CASH, res.GetInt32(6));  // type
-                        Assert.True(res.IsDBNull(7)); // Debit field should be null.                     Debit
-                        Assert.True(res.IsDBNull(8)); // Provider field should be null.                  Provider
-                        Assert.True(res.IsDBNull(9)); // Number should be null.                          Number
-                        Assert.True(res.IsDBNull(10)); // Name should be null.                           Name
-                        Assert.False(res.IsDBNull(11)); // Currency should NOT be null.                  Currency
-                        Assert.AreEqual((e.Method as Cash).Currency, res.GetValue(11).ToString());      // Currency
-                        Assert.True(res.IsDBNull(12));                                                  // Savings
-                        Assert.True(res.IsDBNull(13));                                                  // Bankname
+                        while (res.Read())
+                        {
+                            Console.WriteLine(this.StringifyDataRow(res));
+                            Assert.AreEqual(1, res.GetInt32(0));                                            // Id
+                            Assert.AreEqual(e.Value, (float)res.GetDecimal(1));                             // Value
+                            Assert.AreEqual(e.Date, res.GetDateTime(2));                                    // Date
+                            Assert.AreEqual(e.Place, res.GetString(3));                                     // Place
+                            Assert.AreEqual(string.Join(":", e.Tag), res.GetString(4));                     // Tag
+                            Assert.AreEqual(e.Notes, res.GetString(5));                                     // Notes
+                            Assert.AreEqual((int)DataAccessFactory.EpurchaseMethod.CASH, res.GetInt32(6));  // type
+                            Assert.True(res.IsDBNull(7)); // Debit field should be null.                     Debit
+                            Assert.True(res.IsDBNull(8)); // Provider field should be null.                  Provider
+                            Assert.True(res.IsDBNull(9)); // Number should be null.                          Number
+                            Assert.True(res.IsDBNull(10)); // Name should be null.                           Name
+                            Assert.False(res.IsDBNull(11)); // Currency should NOT be null.                  Currency
+                            Assert.AreEqual((e.Method as Cash).Currency, res.GetValue(11).ToString());      // Currency
+                            Assert.True(res.IsDBNull(12));                                                  // Savings
+                            Assert.True(res.IsDBNull(13));                                                  // Bankname
+                        }
                     }
                 }
-            }
 
-            // Clean table of all entries for consecutive runs
-            using (SqliteCommand cmd = this.db.CreateCommand())
-            {
-                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
-                cmd.ExecuteNonQuery();
+                // Clean table of all entries for consecutive runs
+                using (SqliteCommand cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -195,7 +173,7 @@ namespace NUnit.ExpenseTrackerEngineTest
             try
             {
                 // Create Table if it has not been created yet
-                this.dataAccessFactory.CreateNewExpenseTable(this.db);
+                this.dataAccessFactory.CreateNewExpenseTable();
             }
             catch
             {
@@ -212,7 +190,7 @@ namespace NUnit.ExpenseTrackerEngineTest
             e.AddTag("Food");
             e.AddTag("Hygene");
 
-            this.dataAccessFactory.InsertRecord(this.db, e);
+            this.dataAccessFactory.InsertRecord(e);
 
             // Now change e and update it
             e = new Expense(
@@ -225,42 +203,46 @@ namespace NUnit.ExpenseTrackerEngineTest
                 "bought drugz");
             e.AddTag("Drugs");
 
-            this.dataAccessFactory.UpdateRecord(this.db, e);
+            this.dataAccessFactory.UpdateRecord(e);
 
             // verify columns created correctly
-            using (SqliteCommand cmd = this.db.CreateCommand())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                cmd.CommandText = string.Format("SELECT * FROM {0};", TABLENAME);
-
-                using (SqliteDataReader res = cmd.ExecuteReader())
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
                 {
-                    while (res.Read())
+                    cmd.CommandText = string.Format("SELECT * FROM {0};", TABLENAME);
+
+                    using (SqliteDataReader res = cmd.ExecuteReader())
                     {
-                        Console.WriteLine(this.StringifyDataRow(res));
-                        Assert.AreEqual(1, res.GetInt32(0));                                            // Id
-                        Assert.AreEqual(e.Value, (float)res.GetDecimal(1));                             // Value
-                        Assert.AreEqual(e.Date, res.GetDateTime(2));                                    // Date
-                        Assert.AreEqual(e.Place, res.GetString(3));                                     // Place
-                        Assert.AreEqual(string.Join(":", e.Tag), res.GetString(4));                     // Tag
-                        Assert.AreEqual(e.Notes, res.GetString(5));                                     // Notes
-                        Assert.AreEqual((int)DataAccessFactory.EpurchaseMethod.CASH, res.GetInt32(6));  // type
-                        Assert.True(res.IsDBNull(7)); // Debit field should be null.                     Debit
-                        Assert.True(res.IsDBNull(8)); // Provider field should be null.                  Provider
-                        Assert.True(res.IsDBNull(9)); // Number should be null.                          Number
-                        Assert.True(res.IsDBNull(10)); // Name should be null.                           Name
-                        Assert.False(res.IsDBNull(11)); // Currency should NOT be null.                  Currency
-                        Assert.AreEqual((e.Method as Cash).Currency, res.GetValue(11).ToString());      // Currency
-                        Assert.True(res.IsDBNull(12));                                                  // Savings
-                        Assert.True(res.IsDBNull(13));                                                  // Bankname
+                        while (res.Read())
+                        {
+                            Console.WriteLine(this.StringifyDataRow(res));
+                            Assert.AreEqual(1, res.GetInt32(0));                                            // Id
+                            Assert.AreEqual(e.Value, (float)res.GetDecimal(1));                             // Value
+                            Assert.AreEqual(e.Date, res.GetDateTime(2));                                    // Date
+                            Assert.AreEqual(e.Place, res.GetString(3));                                     // Place
+                            Assert.AreEqual(string.Join(":", e.Tag), res.GetString(4));                     // Tag
+                            Assert.AreEqual(e.Notes, res.GetString(5));                                     // Notes
+                            Assert.AreEqual((int)DataAccessFactory.EpurchaseMethod.CASH, res.GetInt32(6));  // type
+                            Assert.True(res.IsDBNull(7)); // Debit field should be null.                     Debit
+                            Assert.True(res.IsDBNull(8)); // Provider field should be null.                  Provider
+                            Assert.True(res.IsDBNull(9)); // Number should be null.                          Number
+                            Assert.True(res.IsDBNull(10)); // Name should be null.                           Name
+                            Assert.False(res.IsDBNull(11)); // Currency should NOT be null.                  Currency
+                            Assert.AreEqual((e.Method as Cash).Currency, res.GetValue(11).ToString());      // Currency
+                            Assert.True(res.IsDBNull(12));                                                  // Savings
+                            Assert.True(res.IsDBNull(13));                                                  // Bankname
+                        }
                     }
                 }
-            }
 
-            // Clean table of all entries for consecutive runs
-            using (SqliteCommand cmd = this.db.CreateCommand())
-            {
-                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
-                cmd.ExecuteNonQuery();
+                // Clean table of all entries for consecutive runs
+                using (SqliteCommand cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -273,7 +255,7 @@ namespace NUnit.ExpenseTrackerEngineTest
             try
             {
                 // Create Table if it has not been created yet
-                this.dataAccessFactory.CreateNewExpenseTable(this.db);
+                this.dataAccessFactory.CreateNewExpenseTable();
             }
             catch
             {
@@ -290,32 +272,36 @@ namespace NUnit.ExpenseTrackerEngineTest
             e.AddTag("Food");
             e.AddTag("Hygene");
 
-            this.dataAccessFactory.InsertRecord(this.db, e);
+            this.dataAccessFactory.InsertRecord(e);
 
             // Now delete it
-            this.dataAccessFactory.DeleteRecord(this.db, 1);
+            this.dataAccessFactory.DeleteRecord(1);
 
             // verify columns created correctly
-            using (SqliteCommand cmd = this.db.CreateCommand())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                cmd.CommandText = string.Format("SELECT count(*) FROM {0};", TABLENAME);
-
-                using (SqliteDataReader res = cmd.ExecuteReader())
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
                 {
-                    while (res.Read())
+                    cmd.CommandText = string.Format("SELECT count(*) FROM {0};", TABLENAME);
+
+                    using (SqliteDataReader res = cmd.ExecuteReader())
                     {
-                        Console.WriteLine(
-                            $@"{res.GetInt32(0),-3}");
-                        Assert.AreEqual(0, res.GetInt32(0));    // count
+                        while (res.Read())
+                        {
+                            Console.WriteLine(
+                                $@"{res.GetInt32(0),-3}");
+                            Assert.AreEqual(0, res.GetInt32(0));    // count
+                        }
                     }
                 }
-            }
 
-            // Clean table of all entries for consecutive runs
-            using (SqliteCommand cmd = this.db.CreateCommand())
-            {
-                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
-                cmd.ExecuteNonQuery();
+                // Clean table of all entries for consecutive runs
+                using (SqliteCommand cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -328,7 +314,7 @@ namespace NUnit.ExpenseTrackerEngineTest
             try
             {
                 // Create Table if it has not been created yet
-                this.dataAccessFactory.CreateNewExpenseTable(this.db);
+                this.dataAccessFactory.CreateNewExpenseTable();
             }
             catch
             {
@@ -345,11 +331,11 @@ namespace NUnit.ExpenseTrackerEngineTest
             e.AddTag("Food");
             e.AddTag("Hygene");
 
-            this.dataAccessFactory.InsertRecord(this.db, e);
-            this.dataAccessFactory.InsertRecord(this.db, e);
-            this.dataAccessFactory.InsertRecord(this.db, e);
+            this.dataAccessFactory.InsertRecord(e);
+            this.dataAccessFactory.InsertRecord(e);
+            this.dataAccessFactory.InsertRecord(e);
 
-            List<Expense> expenses = this.dataAccessFactory.GetAll(this.db);
+            List<Expense> expenses = this.dataAccessFactory.GetAll();
 
             Assert.AreEqual(3, expenses.Count);
             foreach (Expense expense in expenses)
@@ -358,10 +344,14 @@ namespace NUnit.ExpenseTrackerEngineTest
             }
 
             // Clean table of all entries for consecutive runs
-            using (SqliteCommand cmd = this.db.CreateCommand())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
-                cmd.ExecuteNonQuery();
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -374,7 +364,7 @@ namespace NUnit.ExpenseTrackerEngineTest
             try
             {
                 // Create Table if it has not been created yet
-                this.dataAccessFactory.CreateNewExpenseTable(this.db);
+                this.dataAccessFactory.CreateNewExpenseTable();
             }
             catch
             {
@@ -405,15 +395,15 @@ namespace NUnit.ExpenseTrackerEngineTest
                 new HashSet<string> { "Pay" },
                 "first paycheck from gamestop");
 
-            this.dataAccessFactory.InsertRecord(this.db, e1);
-            this.dataAccessFactory.InsertRecord(this.db, e2);
-            this.dataAccessFactory.InsertRecord(this.db, e3);
+            this.dataAccessFactory.InsertRecord(e1);
+            this.dataAccessFactory.InsertRecord(e2);
+            this.dataAccessFactory.InsertRecord(e3);
 
             // case: only one expense is returned anyways
             ExpenseFilter f = new ExpenseFilter(
                 place: new HashSet<string> { "GameStop" });
 
-            Expense result = this.dataAccessFactory.FindOne(this.db, f);
+            Expense result = this.dataAccessFactory.FindOne(f);
 
             Assert.AreEqual(e3, result);
 
@@ -421,7 +411,7 @@ namespace NUnit.ExpenseTrackerEngineTest
             f = new ExpenseFilter(
                 dateExact: DateTime.Today.AddDays(3));
 
-            result = this.dataAccessFactory.FindOne(this.db, f);
+            result = this.dataAccessFactory.FindOne(f);
 
             Assert.IsNull(result);
 
@@ -429,15 +419,19 @@ namespace NUnit.ExpenseTrackerEngineTest
             f = new ExpenseFilter(
                 keywords: new HashSet<string> { "groceries" });
 
-            result = this.dataAccessFactory.FindOne(this.db, f);
+            result = this.dataAccessFactory.FindOne(f);
 
             Assert.AreEqual(e1, result);    // Since both e1 and e2 match they should be sorted ascendingly by id, since e1 was inserted first it should have a lower id and thus be selected over e2
 
             // Clean table of all entries for consecutive runs
-            using (SqliteCommand cmd = this.db.CreateCommand())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
-                cmd.ExecuteNonQuery();
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -450,7 +444,7 @@ namespace NUnit.ExpenseTrackerEngineTest
             try
             {
                 // Create Table if it has not been created yet
-                this.dataAccessFactory.CreateNewExpenseTable(this.db);
+                this.dataAccessFactory.CreateNewExpenseTable();
             }
             catch
             {
@@ -481,15 +475,15 @@ namespace NUnit.ExpenseTrackerEngineTest
                 new HashSet<string> { "Pay" },
                 "first paycheck from gamestop");
 
-            this.dataAccessFactory.InsertRecord(this.db, e1);
-            this.dataAccessFactory.InsertRecord(this.db, e2);
-            this.dataAccessFactory.InsertRecord(this.db, e3);
+            this.dataAccessFactory.InsertRecord(e1);
+            this.dataAccessFactory.InsertRecord(e2);
+            this.dataAccessFactory.InsertRecord(e3);
 
             // case: only one expense is returned anyways
             ExpenseFilter f = new ExpenseFilter(
                 place: new HashSet<string> { "GameStop" });
 
-            List<Expense> result = this.dataAccessFactory.FindAll(this.db, f);
+            List<Expense> result = this.dataAccessFactory.FindAll(f);
 
             Assert.AreEqual(e3, result[0]);
 
@@ -497,7 +491,7 @@ namespace NUnit.ExpenseTrackerEngineTest
             f = new ExpenseFilter(
                 dateExact: DateTime.Today.AddDays(3));
 
-            result = this.dataAccessFactory.FindAll(this.db, f);
+            result = this.dataAccessFactory.FindAll(f);
 
             Assert.AreEqual(0, result.Count);
 
@@ -505,16 +499,20 @@ namespace NUnit.ExpenseTrackerEngineTest
             f = new ExpenseFilter(
                 keywords: new HashSet<string> { "groceries" });
 
-            result = this.dataAccessFactory.FindAll(this.db, f);
+            result = this.dataAccessFactory.FindAll(f);
 
             Assert.AreEqual(e1, result[0]);    // Since both e1 and e2 match they should be sorted ascendingly by id, since e1 was inserted first it should have a lower id and thus be selected over e2
             Assert.AreEqual(e2, result[1]);
 
             // Clean table of all entries for consecutive runs
-            using (SqliteCommand cmd = this.db.CreateCommand())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
-                cmd.ExecuteNonQuery();
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format("DROP TABLE {0};", TABLENAME);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -525,7 +523,6 @@ namespace NUnit.ExpenseTrackerEngineTest
         public void TearDown()
         {
             Console.WriteLine("Here in Teardown!");
-            this.dataAccessFactory.CloseConnection(this.db);
         }
 
         /// <summary>
@@ -541,6 +538,19 @@ namespace NUnit.ExpenseTrackerEngineTest
         private string StringifyDataRow(SqliteDataReader res)
         {
             return $@"{res.GetInt32(0),-3} {res.GetDecimal(1),-8} {res.GetDateTime(2),8} {res.GetString(3),8} {res.GetString(4),20} {res.GetString(5),10} {res.GetInt32(6),3} {res.GetValue(7),3} {res.GetValue(8),22} {res.GetValue(8),22} {res.GetValue(9),6} {res.GetValue(10),10} {res.GetValue(11),5} {res.GetValue(12),3} {res.GetValue(13),10}";
+        }
+
+        /// <summary>
+        /// Generate proper connection string for database connection.
+        /// </summary>
+        /// <returns>Properly formatted connection string.</returns>
+        private string CreateConnectionString()
+        {
+            SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
+            builder.DataSource = "./" + this.testUser.DocumentName + ".db";
+            builder.Password = "mypassword";
+
+            return builder.ConnectionString;
         }
     }
 }

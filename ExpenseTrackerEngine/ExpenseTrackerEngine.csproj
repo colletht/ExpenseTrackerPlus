@@ -108,7 +108,9 @@
     <Compile Include="DirectDeposit.cs" />
     <Compile Include="Expense.cs" />
     <Compile Include="DataAccessFactory.cs" />
+    <Compile Include="ExpenseController.cs" />
     <Compile Include="ExpenseFilter.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="PasswordUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PurchaseMethod.cs" />

@@ -20,18 +20,16 @@ namespace ExpenseTrackerEngine
     /// </summary>
     internal class DataAccessFactory
     {
-        private string filename;
-        private string tablename;
+        private static readonly string EXPENSE_TABLE_NAME = "Expenses";
+        private User user;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataAccessFactory"/> class.
         /// </summary>
-        /// <param name="filename">Name of the database file to access.</param>
-        /// <param name="tablename">Name of the table within the database file to access.</param>
-        public DataAccessFactory(string filename, string tablename)
+        /// <param name="user">User the object is responsible for.</param>
+        public DataAccessFactory(User user)
         {
-            this.filename = filename;
-            this.tablename = tablename;
+            this.user = user;
         }
 
         /// <summary>
@@ -56,108 +54,62 @@ namespace ExpenseTrackerEngine
         }
 
         /// <summary>
-        /// Establish connection to db specified by filename.
-        /// </summary>
-        /// <returns>Connection if it was established, null otherwise.</returns>
-        public SqliteConnection CreateConnection()
-        {
-            SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
-            builder.DataSource = "./" + this.filename + ".db";
-            builder.Password = "mypassword";
-
-            SqliteConnection db = new SqliteConnection(
-                builder.ConnectionString);
-
-            try
-            {
-                db.Open();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return null;
-            }
-
-            return db;
-        }
-
-        /// <summary>
-        /// Closes a connection to the db.
-        /// </summary>
-        /// <param name="db">The connection to the db that should be opeprated on.</param>
-        /// <returns>True or false based on the success of the operation.</returns>
-        public bool CloseConnection(SqliteConnection db)
-        {
-            if (db == null)
-            {
-                return false;
-            }
-
-            db.Close();
-            return true;
-        }
-
-        /// <summary>
         /// Create a new table in the users database for storing expenses.
         /// </summary>
-        /// <param name="db">The connection to the db that should be opeprated on.</param>
-        public void CreateNewExpenseTable(SqliteConnection db)
+        public void CreateNewExpenseTable()
         {
-            if (db == null || db.State == System.Data.ConnectionState.Closed)
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                throw new Exception("Error: Connection must be open prior to calling this method.");
-            }
+                db.Open();
+                SqliteCommand cmd;
 
-            SqliteCommand cmd;
-
-            using (cmd = db.CreateCommand())
-            {
-                cmd.CommandText = string.Format(
-                    "CREATE TABLE {0} (Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "Value DECIMAL, " +
-                    "Date DATETIME, " +
-                    "Place VARCHAR(50), " +
-                    "Tag VARCHAR(200), " +
-                    "Notes VARCHAR(200), " +
-                    "Type INTEGER, " +
-                    "Debit INTEGER, " +
-                    "Provider VARCHAR(20), " +
-                    "Number INTEGER, " +
-                    "Name VARCHAR(100), " +
-                    "Currency VARCHAR(20), " +
-                    "Savings INTEGER, " +
-                    "Bankname VARCHAR(50));", this.tablename);
-                cmd.ExecuteNonQuery();
+                using (cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format(
+                        "CREATE TABLE {0} (Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "Value DECIMAL, " +
+                        "Date DATETIME, " +
+                        "Place VARCHAR(50), " +
+                        "Tag VARCHAR(200), " +
+                        "Notes VARCHAR(200), " +
+                        "Type INTEGER, " +
+                        "Debit INTEGER, " +
+                        "Provider VARCHAR(20), " +
+                        "Number INTEGER, " +
+                        "Name VARCHAR(100), " +
+                        "Currency VARCHAR(20), " +
+                        "Savings INTEGER, " +
+                        "Bankname VARCHAR(50));", DataAccessFactory.EXPENSE_TABLE_NAME);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
         /// <summary>
         /// Inserts the given expense into the given table.
         /// </summary>
-        /// <param name="db">The connection to the db that should be opeprated on.</param>
         /// <param name="expense">The expense object to be placed in the table.</param>
-        public void InsertRecord(SqliteConnection db, Expense expense)
+        public void InsertRecord(Expense expense)
         {
-            if (db == null || db.State == System.Data.ConnectionState.Closed)
-            {
-                throw new Exception("Error: Connection must be open prior to calling this method.");
-            }
-
             if (expense.Id > -1)
             {
                 throw new Exception("Error: expense does has valid Id and therefore should be updated with UpdateRecord()");
             }
 
-            using (SqliteCommand cmd = db.CreateCommand())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                string cmdText = string.Format(
-                    "INSERT INTO {0} ",
-                    this.tablename);
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
+                {
+                    string cmdText = string.Format(
+                        "INSERT INTO {0} ",
+                        DataAccessFactory.EXPENSE_TABLE_NAME);
 
-                DataAccessFactory.PrepareColValueCommand(cmdText, cmd, expense);
+                    DataAccessFactory.PrepareColValueCommand(cmdText, cmd, expense);
 
-                Console.WriteLine(cmd.CommandText);
-                cmd.ExecuteNonQuery();
+                    Console.WriteLine(cmd.CommandText);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -165,31 +117,29 @@ namespace ExpenseTrackerEngine
         /// Updates a given expense in the table.
         /// </summary>
         /// <precondition>Expense must not have a null (-1) id. Must have an id corresponding to an id in the table.</precondition>
-        /// <param name="db">The connection to the db that should be opeprated on.</param>
         /// <param name="expense">The expense object containing the record id and data to update.</param>
         /// <throws>Exception if expense does not contain a valid id.</throws>
-        public void UpdateRecord(SqliteConnection db, Expense expense)
+        public void UpdateRecord(Expense expense)
         {
-            if (db == null || db.State == System.Data.ConnectionState.Closed)
-            {
-                throw new Exception("Error: Connection must be open prior to calling this method.");
-            }
-
             if (expense.Id < 0)
             {
                 throw new Exception("Error: expense does not have a valid id");
             }
 
-            using (SqliteCommand cmd = db.CreateCommand())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                string cmdText = string.Format(
-                  "REPLACE INTO {0} ",
-                  this.tablename);
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
+                {
+                    string cmdText = string.Format(
+                      "REPLACE INTO {0} ",
+                      DataAccessFactory.EXPENSE_TABLE_NAME);
 
-                DataAccessFactory.PrepareColValueCommand(cmdText, cmd, expense);
+                    DataAccessFactory.PrepareColValueCommand(cmdText, cmd, expense);
 
-                Console.WriteLine(cmd.CommandText);
-                cmd.ExecuteNonQuery();
+                    Console.WriteLine(cmd.CommandText);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -197,63 +147,59 @@ namespace ExpenseTrackerEngine
         /// Deletes a given expenses data from the table.
         /// </summary>
         /// <precondition>Expense must not have a null (-1) id. Must have an id corresponding to an id in the table.</precondition>
-        /// <param name="db">The connection to the db that should be opeprated on.</param>
         /// <param name="id">The id of the expense to be deleted. Normally, obtained by first loading the expense from the database.</param>
         /// <throws>Exception if expense does not contain a valid id.</throws>
-        public void DeleteRecord(SqliteConnection db, int id)
+        public void DeleteRecord(int id)
         {
-            if (db == null || db.State == System.Data.ConnectionState.Closed)
-            {
-                throw new Exception("Error: Connection must be open prior to calling this method.");
-            }
-
             if (id < 0)
             {
                 throw new Exception("Error: expense does not have a valid id");
             }
 
-            using (SqliteCommand cmd = db.CreateCommand())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                string cmdText = string.Format(
-                   "DELETE FROM {0} WHERE Id = @id;",
-                   this.tablename);
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
+                {
+                    string cmdText = string.Format(
+                       "DELETE FROM {0} WHERE Id = @id;",
+                       DataAccessFactory.EXPENSE_TABLE_NAME);
 
-                cmd.Parameters.Add(new SqliteParameter("@id", id));
-                cmd.CommandText = cmdText;
-                cmd.Prepare();
+                    cmd.Parameters.Add(new SqliteParameter("@id", id));
+                    cmd.CommandText = cmdText;
+                    cmd.Prepare();
 
-                Console.WriteLine(cmd.CommandText);
-                cmd.ExecuteNonQuery();
+                    Console.WriteLine(cmd.CommandText);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
         /// <summary>
         /// Returns all expenses present within the table in the database.
         /// </summary>
-        /// <param name="db">Open connection to the database.</param>
         /// <returns>List{expense} of all expenses retrieved.</returns>
-        public List<Expense> GetAll(SqliteConnection db)
+        public List<Expense> GetAll()
         {
-            if (db == null || db.State == System.Data.ConnectionState.Closed)
-            {
-                throw new Exception("Error: Connection must be open prior to calling this method.");
-            }
-
             List<Expense> expenses = new List<Expense>();
 
-            using (SqliteCommand cmd = db.CreateCommand())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                string cmdText = string.Format(
-                      "SELECT * FROM {0}",
-                      this.tablename);
-
-                cmd.CommandText = cmdText;
-
-                using (SqliteDataReader rdr = cmd.ExecuteReader())
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
                 {
-                    while (rdr.Read())
+                    string cmdText = string.Format(
+                          "SELECT * FROM {0}",
+                          DataAccessFactory.EXPENSE_TABLE_NAME);
+
+                    cmd.CommandText = cmdText;
+
+                    using (SqliteDataReader rdr = cmd.ExecuteReader())
                     {
-                        expenses.Add(DataAccessFactory.FromRow(rdr));
+                        while (rdr.Read())
+                        {
+                            expenses.Add(DataAccessFactory.FromRow(rdr));
+                        }
                     }
                 }
             }
@@ -264,34 +210,32 @@ namespace ExpenseTrackerEngine
         /// <summary>
         /// Finds the first expense in the database that matches the filter.
         /// </summary>
-        /// <param name="db">Open connection to the database.</param>
         /// <param name="filter">Filter to select expenses by.</param>
         /// <returns>The first expense that matches the filter, otherwise null.</returns>
-        public Expense FindOne(SqliteConnection db, ExpenseFilter filter)
+        public Expense FindOne(ExpenseFilter filter)
         {
-            if (db == null || db.State == System.Data.ConnectionState.Closed)
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                throw new Exception("Error: Connection must be open prior to calling this method.");
-            }
-
-            using (SqliteCommand cmd = db.CreateCommand())
-            {
-                string cmdText = string.Format(
-                      "SELECT * FROM {0} WHERE ",
-                      this.tablename);
-
-                DataAccessFactory.PrepareFilterConstraintCommand(cmdText, cmd, filter);
-                Console.WriteLine(cmd.CommandText);
-
-                using (SqliteDataReader rdr = cmd.ExecuteReader())
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
                 {
-                    if (rdr.Read())
+                    string cmdText = string.Format(
+                          "SELECT * FROM {0} WHERE ",
+                          DataAccessFactory.EXPENSE_TABLE_NAME);
+
+                    DataAccessFactory.PrepareFilterConstraintCommand(cmdText, cmd, filter);
+                    Console.WriteLine(cmd.CommandText);
+
+                    using (SqliteDataReader rdr = cmd.ExecuteReader())
                     {
-                        return DataAccessFactory.FromRow(rdr);
-                    }
-                    else
-                    {
-                        return null;
+                        if (rdr.Read())
+                        {
+                            return DataAccessFactory.FromRow(rdr);
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
                 }
             }
@@ -300,36 +244,34 @@ namespace ExpenseTrackerEngine
         /// <summary>
         /// Finds and returns all expenses in the database that match the given filter.
         /// </summary>
-        /// <param name="db">Open connection to the database.</param>
         /// <param name="filter">Filter to select expenses by.</param>
         /// <returns>All expenses that match the filter, empty list if none are found.</returns>
-        public List<Expense> FindAll(SqliteConnection db, ExpenseFilter filter)
+        public List<Expense> FindAll(ExpenseFilter filter)
         {
-            if (db == null || db.State == System.Data.ConnectionState.Closed)
-            {
-                throw new Exception("Error: Connection must be open prior to calling this method.");
-            }
-
             List<Expense> expenses = new List<Expense>();
 
-            using (SqliteCommand cmd = db.CreateCommand())
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
             {
-                string cmdText = string.Format(
-                    "SELECT * FROM {0} WHERE ",
-                    this.tablename);
-
-                DataAccessFactory.PrepareFilterConstraintCommand(cmdText, cmd, filter);
-
-                Console.WriteLine(cmd.CommandText);
-
-                using (SqliteDataReader rdr = cmd.ExecuteReader())
+                db.Open();
+                using (SqliteCommand cmd = db.CreateCommand())
                 {
-                    while (rdr.Read())
-                    {
-                        Expense e = DataAccessFactory.FromRow(rdr);
+                    string cmdText = string.Format(
+                        "SELECT * FROM {0} WHERE ",
+                        DataAccessFactory.EXPENSE_TABLE_NAME);
 
-                        Console.WriteLine(e);
-                        expenses.Add(e);
+                    DataAccessFactory.PrepareFilterConstraintCommand(cmdText, cmd, filter);
+
+                    Console.WriteLine(cmd.CommandText);
+
+                    using (SqliteDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            Expense e = DataAccessFactory.FromRow(rdr);
+
+                            Console.WriteLine(e);
+                            expenses.Add(e);
+                        }
                     }
                 }
             }
@@ -558,6 +500,19 @@ namespace ExpenseTrackerEngine
             }
 
             return e;
+        }
+
+        /// <summary>
+        /// Generate proper connection string for database connection.
+        /// </summary>
+        /// <returns>Properly formatted connection string.</returns>
+        private string CreateConnectionString()
+        {
+            SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
+            builder.DataSource = "./" + this.user.DocumentName + ".db";
+            builder.Password = "mypassword";
+
+            return builder.ConnectionString;
         }
     }
 }

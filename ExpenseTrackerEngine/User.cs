@@ -24,7 +24,7 @@ namespace ExpenseTrackerEngine
         /// <param name="secretKey">The secret key of the user.</param>
         /// <param name="documentName">The name of the document in which the users data is stored.</param>
         /// <param name="salt">The salt used when hashing the password.</param>
-        private User(string username, string password, string secretKey, string documentName, string salt)
+        internal User(string username, string password, string secretKey, string documentName, string salt)
         {
             this.Username = username;
             this.PasswordHash = password;
