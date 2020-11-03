@@ -21,6 +21,7 @@ namespace ExpenseTrackerEngine
     internal class DataAccessFactory
     {
         private static readonly string EXPENSE_TABLE_NAME = "Expenses";
+        private static readonly string FILTER_TABLE_NAME = "Filters";
         private User user;
 
         /// <summary>
@@ -52,6 +53,16 @@ namespace ExpenseTrackerEngine
             /// </summary>
             DIRECT_DEPOSIT,
         }
+
+        /// <summary>
+        /// Gets a value indicating whether an expense table already exists in the users db.
+        /// </summary>
+        public bool ExpenseTableExists => this.TableExists(EXPENSE_TABLE_NAME);
+
+        /// <summary>
+        /// Gets a value indicating whether a filter table already exists in the users db.
+        /// </summary>
+        public bool FilterTableExists => this.TableExists(FILTER_TABLE_NAME);
 
         /// <summary>
         /// Create a new table in the users database for storing expenses.
@@ -86,7 +97,15 @@ namespace ExpenseTrackerEngine
         }
 
         /// <summary>
-        /// Inserts the given expense into the given table.
+        /// Create a new table in the users database for storing filters.
+        /// </summary>
+        public void CreateNewFilterTable()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Inserts the given expense into the users expense table.
         /// </summary>
         /// <param name="expense">The expense object to be placed in the table.</param>
         public void InsertRecord(Expense expense)
@@ -111,6 +130,15 @@ namespace ExpenseTrackerEngine
                     cmd.ExecuteNonQuery();
                 }
             }
+        }
+
+        /// <summary>
+        /// Inserts the given filter into the users filter table.
+        /// </summary>
+        /// <param name="filter">The filter object to be placed in the table.</param>
+        public void InsertFilter(ExpenseFilter filter)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -176,6 +204,15 @@ namespace ExpenseTrackerEngine
         }
 
         /// <summary>
+        /// Deletes a given filters data from the table.
+        /// </summary>
+        /// <param name="name">The name of the expense to be deleted.</param>
+        public void DeleteFilter(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Returns all expenses present within the table in the database.
         /// </summary>
         /// <returns>List{expense} of all expenses retrieved.</returns>
@@ -205,6 +242,15 @@ namespace ExpenseTrackerEngine
             }
 
             return expenses;
+        }
+
+        /// <summary>
+        /// Returns all the filters present within the database.
+        /// </summary>
+        /// <returns>List{ExpenseFilter} of all filters retrieved.</returns>
+        public List<ExpenseFilter> GetAllFilters()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -513,6 +559,33 @@ namespace ExpenseTrackerEngine
             builder.Password = "mypassword";
 
             return builder.ConnectionString;
+        }
+
+        /// <summary>
+        /// Checks if the table with the given name exists in the database.
+        /// </summary>
+        /// <param name="tablename">Name of the table to check for.</param>
+        /// <returns>True if the table exists false otherwise.</returns>
+        private bool TableExists(string tablename)
+        {
+            using (SqliteConnection db = new SqliteConnection(this.CreateConnectionString()))
+            {
+                db.Open();
+                SqliteCommand cmd;
+
+                using (cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format(
+                        "SELECT COUNT() FROM sqlite_master WHERE type = 'table' AND name = '{0}'; ",
+                        tablename);
+
+                    using (SqliteDataReader rdr = cmd.ExecuteReader())
+                    {
+                        rdr.Read();
+                        return rdr.GetInt32(0) == 1;
+                    }
+                }
+            }
         }
     }
 }
