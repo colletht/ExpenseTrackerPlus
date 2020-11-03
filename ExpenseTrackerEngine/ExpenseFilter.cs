@@ -28,6 +28,7 @@ namespace ExpenseTrackerEngine
         /// Filters created in this way will not be able to specify exact values
         /// or dates..
         /// </summary>
+        /// <param name="name">The name to give to the expense filter.</param>
         /// <param name="maxValue">High value for value range, defaults to float.MaxValue.</param>
         /// <param name="minValue">Low value for value range, defaults to float.MinValue.</param>
         /// <param name="maxDate">High value for date range, defaults to DateTime.MaxValue.</param>
@@ -37,6 +38,7 @@ namespace ExpenseTrackerEngine
         /// <param name="keywords">Expression for keywords we want to match, defaults to match all strings.</param>
         /// <param name="method">Method we want to match. This is always an exact matcher unless none is specified, then purchase method is disregarded when filtering.</param>
         public ExpenseFilter(
+            string name,
             float maxValue = float.MaxValue,
             float minValue = float.MinValue,
             DateTime maxDate = default(DateTime),
@@ -46,6 +48,9 @@ namespace ExpenseTrackerEngine
             HashSet<string> keywords = null,
             PurchaseMethod method = null)
         {
+            // initialize name
+            this.Name = name;
+
             // initialize value filters
             this.MaxValue = maxValue;
             this.MinValue = minValue;
@@ -69,6 +74,7 @@ namespace ExpenseTrackerEngine
         /// ranged date arguments. Filters created in this way will not be able to
         /// specify exact date values.
         /// </summary>
+        /// <param name="name">The name to give to the expense filter.</param>
         /// <param name="valueExact">Exact value that we want to match. Required.</param>
         /// <param name="maxDate">High value for date range, defaults to DateTime.MaxValue.</param>
         /// <param name="minDate">Min value for date range, defaults to DateTime.MinValue.</param>
@@ -77,6 +83,7 @@ namespace ExpenseTrackerEngine
         /// <param name="keywords">Expression for keywords we want to match, defaults to match all strings.</param>
         /// <param name="method">Method we want to match. This is always an exact matcher unless none is specified, then purchase method is disregarded when filtering.</param>
         public ExpenseFilter(
+            string name,
             float valueExact,
             DateTime maxDate = default(DateTime),
             DateTime minDate = default(DateTime),
@@ -85,6 +92,9 @@ namespace ExpenseTrackerEngine
             HashSet<string> keywords = null,
             PurchaseMethod method = null)
         {
+            // initialize name
+            this.Name = name;
+
             // initialize value filters
             this.ExactValue = valueExact;
 
@@ -107,6 +117,7 @@ namespace ExpenseTrackerEngine
         /// ranged value arguments. Filters created in this way will not be able
         /// to specify exact value values.
         /// </summary>
+        /// <param name="name">The name to give to the expense filter.</param>
         /// <param name="dateExact">Exact date to match. Required.</param>
         /// <param name="maxValue">High value for value range, defaults to float.MaxValue.</param>
         /// <param name="minValue">Low value for value range, defaults to float.MinValue.</param>
@@ -115,6 +126,7 @@ namespace ExpenseTrackerEngine
         /// <param name="keywords">Expression for keywords we want to match, defaults to match all strings.</param>
         /// <param name="method">Method we want to match. This is always an exact matcher unless none is specified, then purchase method is disregarded when filtering.</param>
         public ExpenseFilter(
+            string name,
             DateTime dateExact,
             float maxValue = float.MaxValue,
             float minValue = float.MinValue,
@@ -123,6 +135,9 @@ namespace ExpenseTrackerEngine
             HashSet<string> keywords = null,
             PurchaseMethod method = null)
         {
+            // initialize name
+            this.Name = name;
+
             // initialize value filters
             this.maxValue = maxValue;
             this.minValue = minValue;
@@ -148,6 +163,7 @@ namespace ExpenseTrackerEngine
         /// Filters created in this way will not be able to specify ranged values of date
         /// or values.
         /// </summary>
+        /// <param name="name">The name to give to the expense filter.</param>
         /// <param name="valueExact">Exact value that we want to match. Required.</param>
         /// <param name="dateExact">Exact date to match. Required.</param>
         /// <param name="place">Expression for places we want to match, defaults to match all strings.</param>
@@ -155,6 +171,7 @@ namespace ExpenseTrackerEngine
         /// <param name="keywords">Expression for keywords we want to match, defaults to match all strings.</param>
         /// <param name="method">Method we want to match. This is always an exact matcher unless none is specified, then purchase method is disregarded when filtering.</param>
         public ExpenseFilter(
+            string name,
             float valueExact,
             DateTime dateExact,
             HashSet<string> place = null,
@@ -162,6 +179,9 @@ namespace ExpenseTrackerEngine
             HashSet<string> keywords = null,
             PurchaseMethod method = null)
         {
+            // initialize name
+            this.Name = name;
+
             this.minValue = float.MinValue;
             this.maxValue = float.MaxValue;
 
@@ -181,6 +201,14 @@ namespace ExpenseTrackerEngine
 
             // initialize method
             this.Method = method;
+        }
+
+        /// <summary>
+        /// Gets the Name of the filter.
+        /// </summary>
+        public string Name
+        {
+            get;
         }
 
         /// <summary>
@@ -321,11 +349,13 @@ namespace ExpenseTrackerEngine
         /// NOTE: the keyword argument is NOT placed in the filter. neither
         /// is the method argument, these can be added after if prefered.
         /// </summary>
+        /// <param name="filterName">Name to be given to the new filter.</param>
         /// <param name="e">Expense to create a filter for.</param>
         /// <returns>A filter matching the expense.</returns>
-        public static ExpenseFilter FromExpense(Expense e)
+        public static ExpenseFilter FromExpense(string filterName, Expense e)
         {
             return new ExpenseFilter(
+                name: filterName,
                 valueExact: e.Value,
                 dateExact: e.Date,
                 place: new HashSet<string> { e.Place },
@@ -350,10 +380,17 @@ namespace ExpenseTrackerEngine
         /// </summary>
         /// <param name="f1">First Filter to intersect with.</param>
         /// <param name="f2">Second Filter to intersect with.</param>
+        /// <param name="filterName">Name to be given to the new filter. Defaults to "f1.Name|f2.Name".</param>
         /// <returns>ExpenseFilter containing the union.</returns>
-        public static ExpenseFilter Union(ExpenseFilter f1, ExpenseFilter f2)
+        public static ExpenseFilter Union(ExpenseFilter f1, ExpenseFilter f2, string filterName = "")
         {
+            if (filterName == string.Empty)
+            {
+                filterName = f1.Name + '|' + f2.Name;
+            }
+
             return new ExpenseFilter(
+                    name: filterName,
                     maxValue: new[] { f1.MaxValue, f2.MaxValue }.Max(),
                     minValue: new[] { f1.MinValue, f2.MinValue }.Min(),
                     maxDate: new[] { f1.MaxDate, f2.MaxDate }.Max(),
@@ -369,6 +406,25 @@ namespace ExpenseTrackerEngine
         {
             ExpenseFilter f = (ExpenseFilter)obj;
 
+            return (this.Name == f.Name) &&
+                (this.MinValue == f.MinValue) &&
+                (this.MaxValue == f.MaxValue) &&
+                (this.MinDate == f.MinDate) &&
+                (this.MaxDate == f.MaxDate) &&
+                this.Place.SetEquals(f.Place) &&
+                this.Tag.SetEquals(f.Tag) &&
+                this.Keywords.SetEquals(f.Keywords) &&
+                ExpenseFilter.MethodEqual(this.Method, f.Method);
+        }
+
+        /// <summary>
+        /// Checks that the two filters functionally are the same. That is they match the same set of expenses.
+        /// The name is left out during this comparison.
+        /// </summary>
+        /// <param name="f">Filter to compare against.</param>
+        /// <returns>True if the filters are functionaly equal. False if not.</returns>
+        public bool FunctionalEquals(ExpenseFilter f)
+        {
             return (this.MinValue == f.MinValue) &&
                 (this.MaxValue == f.MaxValue) &&
                 (this.MinDate == f.MinDate) &&
@@ -389,6 +445,7 @@ namespace ExpenseTrackerEngine
                 int hash = 17;
 
                 // Suitable nullity checks etc, of course :)
+                hash = (hash * 23) + this.Name.GetHashCode();
                 hash = (hash * 23) + this.MaxValue.GetHashCode();
                 hash = (hash * 23) + this.MinValue.GetHashCode();
                 hash = (hash * 23) + this.MaxDate.GetHashCode();
@@ -399,7 +456,7 @@ namespace ExpenseTrackerEngine
 
                 if (this.Method != null)
                 {
-                    hash = (hash * 23) + this.MinDate.GetHashCode();
+                    hash = (hash * 23) + this.Method.GetHashCode();
                 }
 
                 return hash;
@@ -410,7 +467,8 @@ namespace ExpenseTrackerEngine
         public override string ToString()
         {
             string outstring = string.Format(
-                "ExpenseFilter: {0}-{1}, {2}-{3}",
+                "ExpenseFilter {0}: {1}-{2}, {3}-{4}",
+                this.Name,
                 this.MinValue,
                 this.maxValue,
                 this.MinDate,

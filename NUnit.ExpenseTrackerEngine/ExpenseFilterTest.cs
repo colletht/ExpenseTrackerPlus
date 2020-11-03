@@ -41,12 +41,13 @@ namespace NUnit.ExpenseTrackerEngineTest
                 "Bought groceries and handsoap");
 
             ExpenseFilter f = new ExpenseFilter(
+                name: "TestFilter",
                 50f,
                 DateTime.Today,
                 new HashSet<string> { "Walmart" },
                 new HashSet<string> { "food", "hygene" });
 
-            Assert.AreEqual(f, ExpenseFilter.FromExpense(e));
+            Assert.IsTrue(f.FunctionalEquals(ExpenseFilter.FromExpense("OtherFilter", e)));
         }
 
         /// <summary>
@@ -57,6 +58,7 @@ namespace NUnit.ExpenseTrackerEngineTest
         {
             // case 1: Filters have no intersection.
             ExpenseFilter f1 = new ExpenseFilter(
+                name: "TestFilter",
                 1000f,
                 DateTime.Today.AddYears(5),
                 new HashSet<string> { "Walmart" },
@@ -65,6 +67,7 @@ namespace NUnit.ExpenseTrackerEngineTest
                 new Card());
 
             ExpenseFilter f2 = new ExpenseFilter(
+                name: "TestFilter",
                 -1000f,
                 DateTime.Today.AddYears(-5),
                 new HashSet<string> { "ToysRUs" },
@@ -73,6 +76,7 @@ namespace NUnit.ExpenseTrackerEngineTest
                 new Cash());
 
             ExpenseFilter fSolution = new ExpenseFilter(
+                name: "TestFilter",
                 1000f,
                 -1000f,
                 DateTime.Today.AddYears(5),
@@ -83,10 +87,11 @@ namespace NUnit.ExpenseTrackerEngineTest
 
             ExpenseFilter fUnion = ExpenseFilter.Union(f1, f2);
 
-            Assert.AreEqual(fSolution, fUnion);
+            Assert.IsTrue(fSolution.FunctionalEquals(fUnion));
 
             // case 2: Filters have a intersection.
             f1 = new ExpenseFilter(
+                name: "TestFilter",
                 1000f,
                 -1000f,
                 DateTime.Today.AddYears(5),
@@ -97,6 +102,7 @@ namespace NUnit.ExpenseTrackerEngineTest
                 new Card());
 
             f2 = new ExpenseFilter(
+                name: "TestFilter",
                 1500f,
                 -500f,
                 DateTime.Today.AddYears(7),
@@ -107,6 +113,7 @@ namespace NUnit.ExpenseTrackerEngineTest
                 new Card());
 
             fSolution = new ExpenseFilter(
+                name: "TestFilter",
                 1500f,
                 -1000f,
                 DateTime.Today.AddYears(7),
@@ -118,7 +125,7 @@ namespace NUnit.ExpenseTrackerEngineTest
 
             fUnion = ExpenseFilter.Union(f1, f2);
 
-            Assert.AreEqual(fSolution, fUnion);
+            Assert.IsTrue(fSolution.FunctionalEquals(fUnion));
         }
 
         /// <summary>

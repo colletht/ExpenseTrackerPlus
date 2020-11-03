@@ -401,6 +401,7 @@ namespace NUnit.ExpenseTrackerEngineTest
 
             // case: only one expense is returned anyways
             ExpenseFilter f = new ExpenseFilter(
+                name: "TestFilter",
                 place: new HashSet<string> { "GameStop" });
 
             Expense result = this.dataAccessFactory.FindOne(f);
@@ -409,6 +410,7 @@ namespace NUnit.ExpenseTrackerEngineTest
 
             // case: nothing is returned
             f = new ExpenseFilter(
+                name: "TestFilter",
                 dateExact: DateTime.Today.AddDays(3));
 
             result = this.dataAccessFactory.FindOne(f);
@@ -417,6 +419,7 @@ namespace NUnit.ExpenseTrackerEngineTest
 
             // case: multiple are returned so we need to make sure they are ordered correctly.
             f = new ExpenseFilter(
+                name: "TestFilter",
                 keywords: new HashSet<string> { "groceries" });
 
             result = this.dataAccessFactory.FindOne(f);
@@ -481,6 +484,7 @@ namespace NUnit.ExpenseTrackerEngineTest
 
             // case: only one expense is returned anyways
             ExpenseFilter f = new ExpenseFilter(
+                name: "TestFilter",
                 place: new HashSet<string> { "GameStop" });
 
             List<Expense> result = this.dataAccessFactory.FindAll(f);
@@ -489,6 +493,7 @@ namespace NUnit.ExpenseTrackerEngineTest
 
             // case: nothing is returned
             f = new ExpenseFilter(
+                name: "TestFilter",
                 dateExact: DateTime.Today.AddDays(3));
 
             result = this.dataAccessFactory.FindAll(f);
@@ -497,6 +502,7 @@ namespace NUnit.ExpenseTrackerEngineTest
 
             // case: multiple are returned so we need to make sure they are ordered correctly.
             f = new ExpenseFilter(
+                name: "TestFilter",
                 keywords: new HashSet<string> { "groceries" });
 
             result = this.dataAccessFactory.FindAll(f);
