@@ -213,7 +213,7 @@ namespace ExpenseTrackerEngine
         }
 
         /// <summary>
-        /// Returns all expenses present within the table in the database.
+        /// Returns all expenses present within the table in the database. Sorted by Date in ascending order.
         /// </summary>
         /// <returns>List{expense} of all expenses retrieved.</returns>
         public List<Expense> GetAll()
@@ -226,7 +226,7 @@ namespace ExpenseTrackerEngine
                 using (SqliteCommand cmd = db.CreateCommand())
                 {
                     string cmdText = string.Format(
-                          "SELECT * FROM {0}",
+                          "SELECT * FROM {0} ORDER BY Date ASC;",
                           DataAccessFactory.EXPENSE_TABLE_NAME);
 
                     cmd.CommandText = cmdText;
@@ -254,7 +254,7 @@ namespace ExpenseTrackerEngine
         }
 
         /// <summary>
-        /// Finds the first expense in the database that matches the filter.
+        /// Finds the first expense in the database that matches the filter. Sorted by Date in ascending order.
         /// </summary>
         /// <param name="filter">Filter to select expenses by.</param>
         /// <returns>The first expense that matches the filter, otherwise null.</returns>
@@ -288,7 +288,7 @@ namespace ExpenseTrackerEngine
         }
 
         /// <summary>
-        /// Finds and returns all expenses in the database that match the given filter.
+        /// Finds and returns all expenses in the database that match the given filter. Sorted by Date in ascending order.
         /// </summary>
         /// <param name="filter">Filter to select expenses by.</param>
         /// <returns>All expenses that match the filter, empty list if none are found.</returns>
@@ -398,6 +398,7 @@ namespace ExpenseTrackerEngine
 
         /// <summary>
         /// Summarizes the ExpenseFilters set of expenses in SQL, that can be easily added to a where clause.
+        /// Sorts by date.
         /// </summary>
         private static void PrepareFilterConstraintCommand(string prefix, SqliteCommand cmd, ExpenseFilter filter)
         {
@@ -496,7 +497,7 @@ namespace ExpenseTrackerEngine
                 }
             }
 
-            outstring += " ORDER BY Id ASC;";
+            outstring += " ORDER BY Date ASC;";
 
             cmd.CommandText = prefix + outstring;
             cmd.Prepare();

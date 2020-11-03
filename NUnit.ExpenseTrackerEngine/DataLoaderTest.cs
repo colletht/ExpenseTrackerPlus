@@ -101,13 +101,10 @@ namespace NUnit.ExpenseTrackerEngineTest
         [Test]
         public void InsertRecordTest()
         {
-            try
+            if (!this.dataAccessFactory.ExpenseTableExists)
             {
                 // Create Table if it has not been created yet
                 this.dataAccessFactory.CreateNewExpenseTable();
-            }
-            catch
-            {
             }
 
             Expense e = new Expense(
@@ -170,13 +167,10 @@ namespace NUnit.ExpenseTrackerEngineTest
         [Test]
         public void UpdateRecordTest()
         {
-            try
+            if (!this.dataAccessFactory.ExpenseTableExists)
             {
                 // Create Table if it has not been created yet
                 this.dataAccessFactory.CreateNewExpenseTable();
-            }
-            catch
-            {
             }
 
             Expense e = new Expense(
@@ -252,13 +246,10 @@ namespace NUnit.ExpenseTrackerEngineTest
         [Test]
         public void DeleteRecordTest()
         {
-            try
+            if (!this.dataAccessFactory.ExpenseTableExists)
             {
                 // Create Table if it has not been created yet
                 this.dataAccessFactory.CreateNewExpenseTable();
-            }
-            catch
-            {
             }
 
             Expense e = new Expense(
@@ -311,13 +302,10 @@ namespace NUnit.ExpenseTrackerEngineTest
         [Test]
         public void GetAllTest()
         {
-            try
+            if (!this.dataAccessFactory.ExpenseTableExists)
             {
                 // Create Table if it has not been created yet
                 this.dataAccessFactory.CreateNewExpenseTable();
-            }
-            catch
-            {
             }
 
             Expense e = new Expense(
@@ -361,13 +349,10 @@ namespace NUnit.ExpenseTrackerEngineTest
         [Test]
         public void FindOneTest()
         {
-            try
+            if (!this.dataAccessFactory.ExpenseTableExists)
             {
                 // Create Table if it has not been created yet
                 this.dataAccessFactory.CreateNewExpenseTable();
-            }
-            catch
-            {
             }
 
             // put expenses into database
@@ -444,13 +429,10 @@ namespace NUnit.ExpenseTrackerEngineTest
         [Test]
         public void FindAllTest()
         {
-            try
+            if (!this.dataAccessFactory.ExpenseTableExists)
             {
                 // Create Table if it has not been created yet
                 this.dataAccessFactory.CreateNewExpenseTable();
-            }
-            catch
-            {
             }
 
             // put expenses into database

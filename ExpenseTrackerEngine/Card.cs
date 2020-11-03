@@ -13,7 +13,7 @@ namespace ExpenseTrackerEngine
     /// <summary>
     /// Models the purchase method representing a card.
     /// </summary>
-    public class Card : PurchaseMethod
+    public class Card : PurchaseMethod, IComparable
     {
         private bool debit;
         private string provider;
@@ -100,6 +100,56 @@ namespace ExpenseTrackerEngine
                 hash = (hash * 23) + this.Number.GetHashCode();
                 hash = (hash * 23) + this.Name.GetHashCode();
                 return hash;
+            }
+        }
+
+        /// <inheritdoc/>
+        public new int CompareTo(object obj)
+        {
+            if (obj is Card)
+            {
+                Card c = obj as Card;
+
+                if (this.Number.CompareTo(c.Number) == 0)
+                {
+                    if (this.Provider.CompareTo(c.Provider) == 0)
+                    {
+                        if (this.Debit.CompareTo(c.Debit) == 0)
+                        {
+                            return this.Name.CompareTo(c.Name);
+                        }
+                        else
+                        {
+                            return this.Debit.CompareTo(c.Debit);
+                        }
+                    }
+                    else
+                    {
+                        return this.Provider.CompareTo(c.Provider);
+                    }
+                }
+                else
+                {
+                    return this.Number.CompareTo(c.Number);
+                }
+            }
+            else if (obj is Cash)
+            {
+                Cash c = obj as Cash;
+
+                // Cards should always come after Cash.
+                return 1;
+            }
+            else if (obj is DirectDeposit)
+            {
+                DirectDeposit d = obj as DirectDeposit;
+
+                // Cards should always come before direct deposit.
+                return -1;
+            }
+            else
+            {
+                throw new InvalidCastException("Types are incompatible, can only compare subclasses of PurchaseMethod with one another");
             }
         }
 

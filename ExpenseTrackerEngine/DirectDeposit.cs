@@ -13,7 +13,7 @@ namespace ExpenseTrackerEngine
     /// <summary>
     /// Models a Direct Deposit method of purchase.
     /// </summary>
-    public class DirectDeposit : PurchaseMethod
+    public class DirectDeposit : PurchaseMethod, IComparable
     {
         private bool savings;
         private string bankName;
@@ -100,6 +100,56 @@ namespace ExpenseTrackerEngine
                 hash = (hash * 23) + this.Number.GetHashCode();
                 hash = (hash * 23) + this.Name.GetHashCode();
                 return hash;
+            }
+        }
+
+        /// <inheritdoc/>
+        public new int CompareTo(object obj)
+        {
+            if (obj is Card)
+            {
+                Card c = obj as Card;
+
+                // DirectDeposit should always come after Card.
+                return 1;
+            }
+            else if (obj is Cash)
+            {
+                Cash c = obj as Cash;
+
+                // DirectDeposit should always come after Cash.
+                return 1;
+            }
+            else if (obj is DirectDeposit)
+            {
+                DirectDeposit d = obj as DirectDeposit;
+
+                if (this.BankName.CompareTo(d.BankName) == 0)
+                {
+                    if (this.Number.CompareTo(d.Number) == 0)
+                    {
+                        if (this.Savings.CompareTo(d.Savings) == 0)
+                        {
+                            return this.Name.CompareTo(d.Name);
+                        }
+                        else
+                        {
+                            return this.Savings.CompareTo(d.Savings);
+                        }
+                    }
+                    else
+                    {
+                        return this.Number.CompareTo(d.Number);
+                    }
+                }
+                else
+                {
+                    return this.BankName.CompareTo(d.BankName);
+                }
+            }
+            else
+            {
+                throw new InvalidCastException("Types are incompatible, can only compare subclasses of PurchaseMethod with one another");
             }
         }
 

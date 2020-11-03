@@ -13,7 +13,7 @@ namespace ExpenseTrackerEngine
     /// <summary>
     /// A purchase method representing the cash method.
     /// </summary>
-    public class Cash : PurchaseMethod
+    public class Cash : PurchaseMethod, IComparable
     {
         private string currency;
 
@@ -54,6 +54,35 @@ namespace ExpenseTrackerEngine
                 // Suitable nullity checks etc, of course :)
                 hash = (hash * 23) + this.Currency.GetHashCode();
                 return hash;
+            }
+        }
+
+        /// <inheritdoc/>
+        public new int CompareTo(object obj)
+        {
+            if (obj is Card)
+            {
+                Card c = obj as Card;
+
+                // Cash should always come before Card.
+                return -1;
+            }
+            else if (obj is Cash)
+            {
+                Cash c = obj as Cash;
+
+                return this.Currency.CompareTo(c.Currency);
+            }
+            else if (obj is DirectDeposit)
+            {
+                DirectDeposit d = obj as DirectDeposit;
+
+                // Cash should always come before DirectDeposit.
+                return -1;
+            }
+            else
+            {
+                throw new InvalidCastException("Types are incompatible, can only compare subclasses of PurchaseMethod with one another");
             }
         }
 

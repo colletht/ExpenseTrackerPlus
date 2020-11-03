@@ -87,6 +87,32 @@ namespace ExpenseTrackerEngine
         }
 
         /// <summary>
+        /// Enumerates the fields of an expense that controller can sort by.
+        /// </summary>
+        public enum ESortField
+        {
+            /// <summary>
+            /// Sort by Date.
+            /// </summary>
+            DATE,
+
+            /// <summary>
+            /// Sort by Value.
+            /// </summary>
+            VALUE,
+
+            /// <summary>
+            /// Sort by Place.
+            /// </summary>
+            PLACE,
+
+            /// <summary>
+            /// Sort by Method.
+            /// </summary>
+            METHOD,
+        }
+
+        /// <summary>
         /// Gets the number of expenses currently loaded in.
         /// </summary>
         public int CurrentExpensesCount => this.currentExpenses.Count();
@@ -156,6 +182,43 @@ namespace ExpenseTrackerEngine
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Sorts the controller by the given field.
+        /// </summary>
+        /// <param name="field">field to sort by.</param>
+        /// <param name="ascending">Sort in ascending or descending order. Defaults to ascending(true).</param>
+        public void SortBy(ESortField field, bool ascending = true)
+        {
+            this.currentExpenses.Sort((Expense e1, Expense e2) =>
+            {
+                int retVal;
+                switch (field)
+                {
+                    case ESortField.DATE:
+                        retVal = e1.Date.CompareTo(e2.Date);
+                        break;
+                    case ESortField.VALUE:
+                        retVal = e1.Value.CompareTo(e2.Value);
+                        break;
+                    case ESortField.PLACE:
+                        retVal = e1.Place.CompareTo(e2.Place);
+                        break;
+                    case ESortField.METHOD:
+                        retVal = e1.Method.CompareTo(e2.Method);
+                        break;
+                    default:
+                        throw new InvalidEnumArgumentException("Should never get here, use a valid value for ESortField");
+                }
+
+                if (!ascending)
+                {
+                    retVal *= -1;
+                }
+
+                return retVal;
+            });
         }
 
         /// <summary>
