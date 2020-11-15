@@ -30,7 +30,15 @@ namespace ExpenseTrackerEngine
             // Setup members
             this.CurrentUser = user;
             this.ExpenseDataAccess = new DataAccessFactory(this.CurrentUser);
-            this.ActiveFilter = null;
+
+            // only place we dont use property because we dont want to refresh table as we are jsut creating it.
+            this.activeFilter = null;
+
+            // If the expense table doesnt yet exist, create it before loading expenses.
+            if (!this.ExpenseDataAccess.ExpenseTableExists)
+            {
+                this.ExpenseDataAccess.CreateNewExpenseTable();
+            }
 
             // Initially load all expenses into controller
             this.currentExpenses = this.ExpenseDataAccess.GetAll();

@@ -117,7 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="authenticatorInstructionTextBox.Text" xml:space="preserve">
-    <value>Google authenticator is a two factor authenticator app that is free to download. To get started find the app by searching "Google Authenticator" in your app vendor of choice, download it, and scan the above qr code to add ExpenseTracker to the app!</value>
-  </data>
 </root>

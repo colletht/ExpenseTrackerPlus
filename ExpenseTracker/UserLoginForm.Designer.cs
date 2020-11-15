@@ -28,40 +28,30 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UserLoginForm));
-            this.qrCodePictureBox = new System.Windows.Forms.PictureBox();
             this.titleBarTextBox = new System.Windows.Forms.TextBox();
             this.newProfileTitleTextBox = new System.Windows.Forms.TextBox();
             this.loginTitleTextBox = new System.Windows.Forms.TextBox();
-            this.emailLabelTextBox = new System.Windows.Forms.TextBox();
+            this.usernameLabelTextBox = new System.Windows.Forms.TextBox();
             this.passwordLabelTextBox = new System.Windows.Forms.TextBox();
-            this.emailInputTextBox = new System.Windows.Forms.TextBox();
+            this.usernameInputTextBox = new System.Windows.Forms.TextBox();
             this.passwordInputTextBox = new System.Windows.Forms.TextBox();
-            this.newEmailLabelTextBox = new System.Windows.Forms.TextBox();
-            this.newEmailInputTextBox = new System.Windows.Forms.TextBox();
+            this.newUsernameLabelTextBox = new System.Windows.Forms.TextBox();
+            this.newUsernameInputTextBox = new System.Windows.Forms.TextBox();
             this.newPasswordLabelTextBox = new System.Windows.Forms.TextBox();
             this.newPasswordInputTextBox = new System.Windows.Forms.TextBox();
             this.confirmPasswordLabelTextBox = new System.Windows.Forms.TextBox();
             this.confirmPasswordInputTextBox = new System.Windows.Forms.TextBox();
-            this.instructionReferalTextBox = new System.Windows.Forms.TextBox();
-            this.confirmNewAccountTextBox = new System.Windows.Forms.Button();
+            this.confirmNewAccountButton = new System.Windows.Forms.Button();
             this.loginButton = new System.Windows.Forms.Button();
-            this.authenticatorInstructionTextBox = new System.Windows.Forms.TextBox();
-            ((System.ComponentModel.ISupportInitialize)(this.qrCodePictureBox)).BeginInit();
+            this.newAccountErrorMessageTextBox = new System.Windows.Forms.TextBox();
+            this.loginErrorMessageTextBox = new System.Windows.Forms.TextBox();
+            this.googleAuthenticatorUserControl = new ExpenseTracker.GoogleAuthenticatorUserControl();
             this.SuspendLayout();
-            // 
-            // qrCodePictureBox
-            // 
-            this.qrCodePictureBox.Location = new System.Drawing.Point(12, 12);
-            this.qrCodePictureBox.Name = "qrCodePictureBox";
-            this.qrCodePictureBox.Size = new System.Drawing.Size(200, 200);
-            this.qrCodePictureBox.TabIndex = 0;
-            this.qrCodePictureBox.TabStop = false;
             // 
             // titleBarTextBox
             // 
             this.titleBarTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.titleBarTextBox.Location = new System.Drawing.Point(219, 13);
+            this.titleBarTextBox.Location = new System.Drawing.Point(12, 12);
             this.titleBarTextBox.Name = "titleBarTextBox";
             this.titleBarTextBox.ReadOnly = true;
             this.titleBarTextBox.Size = new System.Drawing.Size(569, 38);
@@ -72,7 +62,7 @@
             // newProfileTitleTextBox
             // 
             this.newProfileTitleTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.newProfileTitleTextBox.Location = new System.Drawing.Point(219, 58);
+            this.newProfileTitleTextBox.Location = new System.Drawing.Point(12, 57);
             this.newProfileTitleTextBox.Name = "newProfileTitleTextBox";
             this.newProfileTitleTextBox.ReadOnly = true;
             this.newProfileTitleTextBox.Size = new System.Drawing.Size(287, 30);
@@ -83,7 +73,7 @@
             // loginTitleTextBox
             // 
             this.loginTitleTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.loginTitleTextBox.Location = new System.Drawing.Point(512, 58);
+            this.loginTitleTextBox.Location = new System.Drawing.Point(305, 57);
             this.loginTitleTextBox.Name = "loginTitleTextBox";
             this.loginTitleTextBox.ReadOnly = true;
             this.loginTitleTextBox.Size = new System.Drawing.Size(276, 30);
@@ -91,68 +81,65 @@
             this.loginTitleTextBox.Text = "Login";
             this.loginTitleTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // emailLabelTextBox
+            // usernameLabelTextBox
             // 
-            this.emailLabelTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.emailLabelTextBox.Location = new System.Drawing.Point(512, 95);
-            this.emailLabelTextBox.Name = "emailLabelTextBox";
-            this.emailLabelTextBox.ReadOnly = true;
-            this.emailLabelTextBox.Size = new System.Drawing.Size(276, 23);
-            this.emailLabelTextBox.TabIndex = 4;
-            this.emailLabelTextBox.Text = "Email:";
+            this.usernameLabelTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.usernameLabelTextBox.Location = new System.Drawing.Point(305, 94);
+            this.usernameLabelTextBox.Name = "usernameLabelTextBox";
+            this.usernameLabelTextBox.ReadOnly = true;
+            this.usernameLabelTextBox.Size = new System.Drawing.Size(276, 23);
+            this.usernameLabelTextBox.TabIndex = 4;
+            this.usernameLabelTextBox.Text = "Email:";
             // 
             // passwordLabelTextBox
             // 
             this.passwordLabelTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.passwordLabelTextBox.Location = new System.Drawing.Point(512, 152);
+            this.passwordLabelTextBox.Location = new System.Drawing.Point(305, 151);
             this.passwordLabelTextBox.Name = "passwordLabelTextBox";
             this.passwordLabelTextBox.ReadOnly = true;
             this.passwordLabelTextBox.Size = new System.Drawing.Size(276, 23);
             this.passwordLabelTextBox.TabIndex = 5;
             this.passwordLabelTextBox.Text = "Password:";
             // 
-            // emailInputTextBox
+            // usernameInputTextBox
             // 
-            this.emailInputTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.emailInputTextBox.Location = new System.Drawing.Point(512, 123);
-            this.emailInputTextBox.Name = "emailInputTextBox";
-            this.emailInputTextBox.Size = new System.Drawing.Size(276, 23);
-            this.emailInputTextBox.TabIndex = 6;
-            this.emailInputTextBox.Text = "john.doe@gmail.com";
+            this.usernameInputTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.usernameInputTextBox.Location = new System.Drawing.Point(305, 122);
+            this.usernameInputTextBox.Name = "usernameInputTextBox";
+            this.usernameInputTextBox.Size = new System.Drawing.Size(276, 23);
+            this.usernameInputTextBox.TabIndex = 6;
             // 
             // passwordInputTextBox
             // 
             this.passwordInputTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.passwordInputTextBox.Location = new System.Drawing.Point(512, 181);
+            this.passwordInputTextBox.Location = new System.Drawing.Point(305, 180);
             this.passwordInputTextBox.Name = "passwordInputTextBox";
             this.passwordInputTextBox.PasswordChar = '.';
             this.passwordInputTextBox.Size = new System.Drawing.Size(276, 23);
             this.passwordInputTextBox.TabIndex = 7;
-            this.passwordInputTextBox.Text = "supersecretpassword...";
             // 
-            // newEmailLabelTextBox
+            // newUsernameLabelTextBox
             // 
-            this.newEmailLabelTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.newEmailLabelTextBox.Location = new System.Drawing.Point(219, 95);
-            this.newEmailLabelTextBox.Name = "newEmailLabelTextBox";
-            this.newEmailLabelTextBox.ReadOnly = true;
-            this.newEmailLabelTextBox.Size = new System.Drawing.Size(287, 23);
-            this.newEmailLabelTextBox.TabIndex = 8;
-            this.newEmailLabelTextBox.Text = "Email:";
+            this.newUsernameLabelTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.newUsernameLabelTextBox.Location = new System.Drawing.Point(12, 94);
+            this.newUsernameLabelTextBox.Name = "newUsernameLabelTextBox";
+            this.newUsernameLabelTextBox.ReadOnly = true;
+            this.newUsernameLabelTextBox.Size = new System.Drawing.Size(287, 23);
+            this.newUsernameLabelTextBox.TabIndex = 8;
+            this.newUsernameLabelTextBox.Text = "Username:";
             // 
-            // newEmailInputTextBox
+            // newUsernameInputTextBox
             // 
-            this.newEmailInputTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.newEmailInputTextBox.Location = new System.Drawing.Point(219, 124);
-            this.newEmailInputTextBox.Name = "newEmailInputTextBox";
-            this.newEmailInputTextBox.Size = new System.Drawing.Size(287, 23);
-            this.newEmailInputTextBox.TabIndex = 9;
-            this.newEmailInputTextBox.Text = "john.doe@gmail.com";
+            this.newUsernameInputTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.newUsernameInputTextBox.Location = new System.Drawing.Point(12, 123);
+            this.newUsernameInputTextBox.Name = "newUsernameInputTextBox";
+            this.newUsernameInputTextBox.Size = new System.Drawing.Size(287, 23);
+            this.newUsernameInputTextBox.TabIndex = 9;
             // 
             // newPasswordLabelTextBox
             // 
             this.newPasswordLabelTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.newPasswordLabelTextBox.Location = new System.Drawing.Point(219, 153);
+            this.newPasswordLabelTextBox.Location = new System.Drawing.Point(12, 152);
             this.newPasswordLabelTextBox.Name = "newPasswordLabelTextBox";
             this.newPasswordLabelTextBox.ReadOnly = true;
             this.newPasswordLabelTextBox.Size = new System.Drawing.Size(287, 23);
@@ -162,17 +149,17 @@
             // newPasswordInputTextBox
             // 
             this.newPasswordInputTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.newPasswordInputTextBox.Location = new System.Drawing.Point(219, 181);
+            this.newPasswordInputTextBox.Location = new System.Drawing.Point(12, 180);
             this.newPasswordInputTextBox.Name = "newPasswordInputTextBox";
             this.newPasswordInputTextBox.PasswordChar = '.';
             this.newPasswordInputTextBox.Size = new System.Drawing.Size(287, 23);
             this.newPasswordInputTextBox.TabIndex = 11;
-            this.newPasswordInputTextBox.Text = "supersecretpassword...";
+            this.newPasswordInputTextBox.TextChanged += new System.EventHandler(this.newPasswordInputTextBox_TextChanged);
             // 
             // confirmPasswordLabelTextBox
             // 
             this.confirmPasswordLabelTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.confirmPasswordLabelTextBox.Location = new System.Drawing.Point(219, 210);
+            this.confirmPasswordLabelTextBox.Location = new System.Drawing.Point(12, 209);
             this.confirmPasswordLabelTextBox.Name = "confirmPasswordLabelTextBox";
             this.confirmPasswordLabelTextBox.ReadOnly = true;
             this.confirmPasswordLabelTextBox.Size = new System.Drawing.Size(287, 23);
@@ -182,105 +169,113 @@
             // confirmPasswordInputTextBox
             // 
             this.confirmPasswordInputTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.confirmPasswordInputTextBox.Location = new System.Drawing.Point(219, 239);
+            this.confirmPasswordInputTextBox.Location = new System.Drawing.Point(12, 238);
             this.confirmPasswordInputTextBox.Name = "confirmPasswordInputTextBox";
             this.confirmPasswordInputTextBox.PasswordChar = '.';
             this.confirmPasswordInputTextBox.Size = new System.Drawing.Size(287, 23);
             this.confirmPasswordInputTextBox.TabIndex = 13;
+            this.confirmPasswordInputTextBox.TextChanged += new System.EventHandler(this.confirmPasswordInputTextBox_TextChanged);
             // 
-            // instructionReferalTextBox
+            // confirmNewAccountButton
             // 
-            this.instructionReferalTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.instructionReferalTextBox.Location = new System.Drawing.Point(219, 268);
-            this.instructionReferalTextBox.Multiline = true;
-            this.instructionReferalTextBox.Name = "instructionReferalTextBox";
-            this.instructionReferalTextBox.ReadOnly = true;
-            this.instructionReferalTextBox.Size = new System.Drawing.Size(287, 90);
-            this.instructionReferalTextBox.TabIndex = 14;
-            this.instructionReferalTextBox.Text = "Follow the instructions to the left in order to download google authenticator to " +
-    "your mobile device. Then open the app and scan the QR code. Then hit confirm bel" +
-    "ow to finish setting up!";
-            this.instructionReferalTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // confirmNewAccountTextBox
-            // 
-            this.confirmNewAccountTextBox.Location = new System.Drawing.Point(219, 364);
-            this.confirmNewAccountTextBox.Name = "confirmNewAccountTextBox";
-            this.confirmNewAccountTextBox.Size = new System.Drawing.Size(287, 23);
-            this.confirmNewAccountTextBox.TabIndex = 15;
-            this.confirmNewAccountTextBox.Text = "Confirm";
-            this.confirmNewAccountTextBox.UseVisualStyleBackColor = true;
+            this.confirmNewAccountButton.Location = new System.Drawing.Point(11, 267);
+            this.confirmNewAccountButton.Name = "confirmNewAccountButton";
+            this.confirmNewAccountButton.Size = new System.Drawing.Size(287, 23);
+            this.confirmNewAccountButton.TabIndex = 15;
+            this.confirmNewAccountButton.Text = "Confirm";
+            this.confirmNewAccountButton.UseVisualStyleBackColor = true;
+            this.confirmNewAccountButton.Click += new System.EventHandler(this.confirmNewAccountTextBox_Click);
             // 
             // loginButton
             // 
-            this.loginButton.Location = new System.Drawing.Point(512, 210);
+            this.loginButton.Location = new System.Drawing.Point(305, 209);
             this.loginButton.Name = "loginButton";
             this.loginButton.Size = new System.Drawing.Size(276, 23);
             this.loginButton.TabIndex = 16;
             this.loginButton.Text = "Login";
             this.loginButton.UseVisualStyleBackColor = true;
+            this.loginButton.Click += new System.EventHandler(this.loginButton_Click);
             // 
-            // authenticatorInstructionTextBox
+            // newAccountErrorMessageTextBox
             // 
-            this.authenticatorInstructionTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.authenticatorInstructionTextBox.Location = new System.Drawing.Point(12, 218);
-            this.authenticatorInstructionTextBox.Multiline = true;
-            this.authenticatorInstructionTextBox.Name = "authenticatorInstructionTextBox";
-            this.authenticatorInstructionTextBox.ReadOnly = true;
-            this.authenticatorInstructionTextBox.Size = new System.Drawing.Size(200, 169);
-            this.authenticatorInstructionTextBox.TabIndex = 17;
-            this.authenticatorInstructionTextBox.Text = resources.GetString("authenticatorInstructionTextBox.Text");
-            this.authenticatorInstructionTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.newAccountErrorMessageTextBox.ForeColor = System.Drawing.Color.Red;
+            this.newAccountErrorMessageTextBox.Location = new System.Drawing.Point(13, 297);
+            this.newAccountErrorMessageTextBox.Multiline = true;
+            this.newAccountErrorMessageTextBox.Name = "newAccountErrorMessageTextBox";
+            this.newAccountErrorMessageTextBox.ReadOnly = true;
+            this.newAccountErrorMessageTextBox.Size = new System.Drawing.Size(285, 89);
+            this.newAccountErrorMessageTextBox.TabIndex = 19;
+            this.newAccountErrorMessageTextBox.Visible = false;
+            // 
+            // loginErrorMessageTextBox
+            // 
+            this.loginErrorMessageTextBox.ForeColor = System.Drawing.Color.Red;
+            this.loginErrorMessageTextBox.Location = new System.Drawing.Point(305, 297);
+            this.loginErrorMessageTextBox.Multiline = true;
+            this.loginErrorMessageTextBox.Name = "loginErrorMessageTextBox";
+            this.loginErrorMessageTextBox.ReadOnly = true;
+            this.loginErrorMessageTextBox.Size = new System.Drawing.Size(285, 89);
+            this.loginErrorMessageTextBox.TabIndex = 20;
+            this.loginErrorMessageTextBox.Visible = false;
+            // 
+            // googleAuthenticatorUserControl
+            // 
+            this.googleAuthenticatorUserControl.Enabled = false;
+            this.googleAuthenticatorUserControl.Location = new System.Drawing.Point(70, 12);
+            this.googleAuthenticatorUserControl.Name = "googleAuthenticatorUserControl";
+            this.googleAuthenticatorUserControl.Size = new System.Drawing.Size(429, 386);
+            this.googleAuthenticatorUserControl.TabIndex = 18;
+            this.googleAuthenticatorUserControl.Visible = false;
             // 
             // UserLoginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.authenticatorInstructionTextBox);
+            this.ClientSize = new System.Drawing.Size(596, 398);
+            this.Controls.Add(this.loginErrorMessageTextBox);
+            this.Controls.Add(this.newAccountErrorMessageTextBox);
             this.Controls.Add(this.loginButton);
-            this.Controls.Add(this.confirmNewAccountTextBox);
-            this.Controls.Add(this.instructionReferalTextBox);
+            this.Controls.Add(this.confirmNewAccountButton);
             this.Controls.Add(this.confirmPasswordInputTextBox);
             this.Controls.Add(this.confirmPasswordLabelTextBox);
             this.Controls.Add(this.newPasswordInputTextBox);
             this.Controls.Add(this.newPasswordLabelTextBox);
-            this.Controls.Add(this.newEmailInputTextBox);
-            this.Controls.Add(this.newEmailLabelTextBox);
+            this.Controls.Add(this.newUsernameInputTextBox);
+            this.Controls.Add(this.newUsernameLabelTextBox);
             this.Controls.Add(this.passwordInputTextBox);
-            this.Controls.Add(this.emailInputTextBox);
+            this.Controls.Add(this.usernameInputTextBox);
             this.Controls.Add(this.passwordLabelTextBox);
-            this.Controls.Add(this.emailLabelTextBox);
+            this.Controls.Add(this.usernameLabelTextBox);
             this.Controls.Add(this.loginTitleTextBox);
             this.Controls.Add(this.newProfileTitleTextBox);
             this.Controls.Add(this.titleBarTextBox);
-            this.Controls.Add(this.qrCodePictureBox);
+            this.Controls.Add(this.googleAuthenticatorUserControl);
             this.Name = "UserLoginForm";
             this.Text = "UserLoginForm";
-            ((System.ComponentModel.ISupportInitialize)(this.qrCodePictureBox)).EndInit();
+            this.Load += new System.EventHandler(this.UserLoginForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.PictureBox qrCodePictureBox;
         private System.Windows.Forms.TextBox titleBarTextBox;
         private System.Windows.Forms.TextBox newProfileTitleTextBox;
         private System.Windows.Forms.TextBox loginTitleTextBox;
-        private System.Windows.Forms.TextBox emailLabelTextBox;
+        private System.Windows.Forms.TextBox usernameLabelTextBox;
         private System.Windows.Forms.TextBox passwordLabelTextBox;
-        private System.Windows.Forms.TextBox emailInputTextBox;
+        private System.Windows.Forms.TextBox usernameInputTextBox;
         private System.Windows.Forms.TextBox passwordInputTextBox;
-        private System.Windows.Forms.TextBox newEmailLabelTextBox;
-        private System.Windows.Forms.TextBox newEmailInputTextBox;
+        private System.Windows.Forms.TextBox newUsernameLabelTextBox;
+        private System.Windows.Forms.TextBox newUsernameInputTextBox;
         private System.Windows.Forms.TextBox newPasswordLabelTextBox;
         private System.Windows.Forms.TextBox newPasswordInputTextBox;
         private System.Windows.Forms.TextBox confirmPasswordLabelTextBox;
         private System.Windows.Forms.TextBox confirmPasswordInputTextBox;
-        private System.Windows.Forms.TextBox instructionReferalTextBox;
-        private System.Windows.Forms.Button confirmNewAccountTextBox;
+        private System.Windows.Forms.Button confirmNewAccountButton;
         private System.Windows.Forms.Button loginButton;
-        private System.Windows.Forms.TextBox authenticatorInstructionTextBox;
+        private GoogleAuthenticatorUserControl googleAuthenticatorUserControl;
+        private System.Windows.Forms.TextBox newAccountErrorMessageTextBox;
+        private System.Windows.Forms.TextBox loginErrorMessageTextBox;
     }
 }

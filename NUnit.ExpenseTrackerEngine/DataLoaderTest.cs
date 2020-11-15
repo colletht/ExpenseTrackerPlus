@@ -13,6 +13,7 @@ namespace NUnit.ExpenseTrackerEngineTest
     using System.Data.Common;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Text;
     using System.Threading.Tasks;
@@ -36,7 +37,7 @@ namespace NUnit.ExpenseTrackerEngineTest
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            File.Delete("./myDatabase.db");
+            File.Delete(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\myDatabase.db");
             Console.WriteLine("Here in one time Setup");
             this.testUser = new User("testUser", "password", "mysupersecretkey", "myDatabase", "supersaltysalt");
             this.dataAccessFactory = new DataAccessFactory(this.testUser);
@@ -520,7 +521,7 @@ namespace NUnit.ExpenseTrackerEngineTest
         public void OneTimeTearDown()
         {
             Console.WriteLine("Here in one time Teardown");
-            File.Delete("./myDatabase.db");
+            File.Delete(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\myDatabase.db");
         }
 
         private string StringifyDataRow(SqliteDataReader res)
@@ -535,7 +536,7 @@ namespace NUnit.ExpenseTrackerEngineTest
         private string CreateConnectionString()
         {
             SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
-            builder.DataSource = "./" + this.testUser.DocumentName + ".db";
+            builder.DataSource = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" + this.testUser.DocumentName + ".db";
             builder.Password = "mypassword";
 
             return builder.ConnectionString;

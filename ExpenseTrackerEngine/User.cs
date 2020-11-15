@@ -6,7 +6,9 @@ namespace ExpenseTrackerEngine
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
     using Microsoft.Data.Sqlite;
@@ -50,18 +52,27 @@ namespace ExpenseTrackerEngine
         }
 
         /// <summary>
-        /// Gets the users secret key.
+        /// Gets the document name of the given user.
         /// </summary>
-        public string SecretKey
+        internal string DocumentName
         {
             get;
             private set;
         }
 
         /// <summary>
-        /// Gets the document name of the given user.
+        /// Gets the username of the user.
         /// </summary>
-        public string DocumentName
+        internal string Username
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the users secret key.
+        /// </summary>
+        internal string SecretKey
         {
             get;
             private set;
@@ -83,14 +94,7 @@ namespace ExpenseTrackerEngine
             }
         }
 
-        /// <summary>
-        /// Gets or Sets the username of the user.
-        /// </summary>
-        private string Username
-        {
-            get;
-            set;
-        }
+        private static bool UserTableExists => TableExists(UserTableName);
 
         /// <summary>
         /// Gets or Sets the password of the user (salted and hashed).
@@ -121,22 +125,26 @@ namespace ExpenseTrackerEngine
             string documentName = "ExpenseTracker" + username;
             string salt = PasswordUtility.GenerateSalt(password.Length);
             string secret = PasswordUtility.GenerateSecret();
-            password = PasswordUtility.SaltPassword(password, salt);
+            string hashedPassword = PasswordUtility.HashPassword(PasswordUtility.SaltPassword(password, salt));
 
-            SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
-            builder.DataSource = "./" + MetaDataFileName + ".db";
-            builder.Password = "mypassword";
+            string connString = CreateConnectionString();
 
-            using (SqliteConnection db = new SqliteConnection(builder.ConnectionString))
+            if (!UserTableExists)
             {
+                CreateUserTable();
+            }
+
+            using (SqliteConnection db = new SqliteConnection(connString))
+            {
+                db.Open();
                 using (SqliteCommand cmd = db.CreateCommand())
                 {
                     cmd.CommandText = string.Format("INSERT INTO {0} (Username, Password, Secret, Document, Salt) VALUES (@username, @password, @secret, @document, @salt);", UserTableName);
 
                     cmd.Parameters.Add(new SqliteParameter("@username", username));
-                    cmd.Parameters.Add(new SqliteParameter("@password", password));
+                    cmd.Parameters.Add(new SqliteParameter("@password", hashedPassword));
                     cmd.Parameters.Add(new SqliteParameter("@secret", secret));
-                    cmd.Parameters.Add(new SqliteParameter("@document", "ExpenseTracker" + username));
+                    cmd.Parameters.Add(new SqliteParameter("@document", documentName));
                     cmd.Parameters.Add(new SqliteParameter("@salt", salt));
 
                     cmd.Prepare();
@@ -145,7 +153,7 @@ namespace ExpenseTrackerEngine
                 }
             }
 
-            return new User(username, password, secret, documentName, salt);
+            return new User(username, hashedPassword, secret, documentName, salt);
         }
 
         /// <summary>
@@ -155,12 +163,16 @@ namespace ExpenseTrackerEngine
         /// <returns>New <see cref="User"/> object representing user now existing in DB.</returns>
         public static User LoadExistingUser(string username)
         {
-            SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
-            builder.DataSource = "./" + MetaDataFileName + ".db";
-            builder.Password = "mypassword";
+            string connString = CreateConnectionString();
 
-            using (SqliteConnection db = new SqliteConnection(builder.ConnectionString))
+            if (!UserTableExists)
             {
+                CreateUserTable();
+            }
+
+            using (SqliteConnection db = new SqliteConnection(connString))
+            {
+                db.Open();
                 using (SqliteCommand cmd = db.CreateCommand())
                 {
                     cmd.CommandText = string.Format("SELECT * FROM {0} WHERE (Username = @username);", UserTableName);
@@ -173,7 +185,7 @@ namespace ExpenseTrackerEngine
                     {
                         if (rdr.Read())
                         {
-                            return new User(username, rdr.GetString(1), rdr.GetString(2), rdr.GetString(3), rdr.GetString(4));
+                            return new User(username, rdr.GetString(2), rdr.GetString(3), rdr.GetString(4), rdr.GetString(5));
                         }
                         else
                         {
@@ -191,15 +203,19 @@ namespace ExpenseTrackerEngine
         /// <returns>True if the username exists, false otherwise.</returns>
         public static bool UserExists(string username)
         {
-            SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
-            builder.DataSource = "./" + MetaDataFileName + ".db";
-            builder.Password = "mypassword";
+            string connString = CreateConnectionString();
 
-            using (SqliteConnection db = new SqliteConnection(builder.ConnectionString))
+            if (!UserTableExists)
             {
+                CreateUserTable();
+            }
+
+            using (SqliteConnection db = new SqliteConnection(connString))
+            {
+                db.Open();
                 using (SqliteCommand cmd = db.CreateCommand())
                 {
-                    cmd.CommandText = string.Format("EXISTS(SELECT * FROM {0} WHERE (Username = @username));", UserTableName);
+                    cmd.CommandText = string.Format("SELECT COUNT() FROM {0} WHERE (Username = @username);", UserTableName);
 
                     cmd.Parameters.Add(new SqliteParameter("@username", username));
 
@@ -209,7 +225,7 @@ namespace ExpenseTrackerEngine
                     {
                         if (rdr.Read())
                         {
-                            return rdr.GetBoolean(0);
+                            return rdr.GetInt32(0) >= 1;
                         }
                         else
                         {
@@ -228,7 +244,72 @@ namespace ExpenseTrackerEngine
         /// <returns>True if the user does indeed match these credentials, false otherwise.</returns>
         public bool VerifyUser(string username, string password)
         {
-            return username == this.Username && PasswordUtility.VerifyPassword(this.PasswordHash, password, this.Salt);
+            return username.Equals(this.Username) && PasswordUtility.VerifyPassword(this.PasswordHash, password, this.Salt);
+        }
+
+        /// <summary>
+        /// Generate proper connection string for database connection.
+        /// </summary>
+        /// <returns>Properly formatted connection string.</returns>
+        private static string CreateConnectionString()
+        {
+            SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
+            builder.DataSource = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" + MetaDataFileName + ".db";
+            builder.Password = "mypassword";
+            builder.Mode = SqliteOpenMode.ReadWriteCreate;
+
+            return builder.ConnectionString;
+        }
+
+        /// <summary>
+        /// Checks if the table with the given name exists in the database.
+        /// </summary>
+        /// <param name="tablename">Name of the table to check for.</param>
+        /// <returns>True if the table exists false otherwise.</returns>
+        private static bool TableExists(string tablename)
+        {
+            using (SqliteConnection db = new SqliteConnection(CreateConnectionString()))
+            {
+                db.Open();
+                SqliteCommand cmd;
+
+                using (cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format(
+                        "SELECT COUNT() FROM sqlite_master WHERE type = 'table' AND name = '{0}'; ",
+                        tablename);
+
+                    using (SqliteDataReader rdr = cmd.ExecuteReader())
+                    {
+                        rdr.Read();
+                        return rdr.GetInt32(0) == 1;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Create the user table.
+        /// </summary>
+        private static void CreateUserTable()
+        {
+            using (SqliteConnection db = new SqliteConnection(CreateConnectionString()))
+            {
+                db.Open();
+                SqliteCommand cmd;
+
+                using (cmd = db.CreateCommand())
+                {
+                    cmd.CommandText = string.Format(
+                        "CREATE TABLE {0} (Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "Username VARCHAR(50), " +
+                        "Password VARCHAR(200), " +
+                        "Secret VARCHAR(50), " +
+                        "Document VARCHAR(200), " +
+                        "Salt VARCHAR(50)); ", UserTableName);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

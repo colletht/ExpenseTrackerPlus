@@ -71,7 +71,7 @@ namespace ExpenseTrackerEngine
         /// <returns>True if the plaintext+salt combination is a match.</returns>
         public static bool VerifyPassword(string hash, string plaintext, string salt)
         {
-            return string.Equals(hash, HashPassword(SaltPassword(plaintext, salt)));
+            return Crypto.VerifyHashedPassword(hash, SaltPassword(plaintext, salt));
         }
     }
 }

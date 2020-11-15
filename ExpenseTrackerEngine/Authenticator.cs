@@ -25,13 +25,13 @@ namespace ExpenseTrackerEngine
         /// </summary>
         public Authenticator()
         {
-            this.QRCodeImageURL = string.Empty;
+            this.QRCodeImageURL = null;
         }
 
         /// <summary>
         /// Gets the Setup QR code for google authenticator if SetUpGoogleAuthenticator has been called.
         /// </summary>
-        public string QRCodeImageURL
+        public byte[] QRCodeImageURL
         {
             get;
             private set;
@@ -68,9 +68,9 @@ namespace ExpenseTrackerEngine
         public string SetUpGoogleAuthenticator()
         {
             this.tfa = new TwoFactorAuthenticator();
-            SetupCode setupInfo = this.tfa.GenerateSetupCode("ExpenseTrackerPlus", "colletht@gmail.com", "mysupersecretsecretkey", false, 300);
+            SetupCode setupInfo = this.tfa.GenerateSetupCode("ExpenseTrackerPlus", this.user.Username, this.user.SecretKey, false, 3);
 
-            this.QRCodeImageURL = setupInfo.QrCodeSetupImageUrl;
+            this.QRCodeImageURL = Convert.FromBase64String(setupInfo.QrCodeSetupImageUrl.Substring(22));
             return setupInfo.ManualEntryKey;
         }
 
@@ -117,6 +117,23 @@ namespace ExpenseTrackerEngine
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="ExpenseController"/> for use.
+        /// This method throws an error if the use has not been authorized
+        /// i.e. <see cref="AuthenticateGoogleAuthenticator(string)"/> must
+        /// be called with a true return value to execute this function.
+        /// </summary>
+        /// <returns>A new ExpenseController controlling the authenticated users credentials.</returns>
+        public ExpenseController CreateExpenseController()
+        {
+            if (this.AuthorizedUser == null)
+            {
+                throw new InvalidOperationException("Must have called AuthenticateGoogleAuthenticator() with a true return before invoking this function.");
+            }
+
+            return new ExpenseController(this.AuthorizedUser);
         }
     }
 }

@@ -9,6 +9,7 @@ namespace ExpenseTrackerEngine
     using System.ComponentModel.Design;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Security.Cryptography;
     using System.Text;
@@ -556,7 +557,7 @@ namespace ExpenseTrackerEngine
         private string CreateConnectionString()
         {
             SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
-            builder.DataSource = "./" + this.user.DocumentName + ".db";
+            builder.DataSource = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" + this.user.DocumentName + ".db";
             builder.Password = "mypassword";
 
             return builder.ConnectionString;

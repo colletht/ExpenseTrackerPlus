@@ -9,6 +9,7 @@ namespace NUnit.ExpenseTrackerEngineTest
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Web.Helpers;
     using ExpenseTrackerEngine;
     using NUnit.Framework;
 
@@ -33,14 +34,16 @@ namespace NUnit.ExpenseTrackerEngineTest
         /// <summary>
         /// Tests VerifyPassword.
         /// </summary>
+        [Test]
         public void VerifyPasswordTest()
         {
-            string salt = PasswordUtility.GenerateSalt(32);
             string password = "mypassword";
+            string salt = PasswordUtility.GenerateSalt(password.Length);
+            string hashPassword = PasswordUtility.HashPassword(PasswordUtility.SaltPassword(password, salt));
 
-            Assert.That(PasswordUtility.VerifyPassword(PasswordUtility.HashPassword(PasswordUtility.SaltPassword(password, salt)), password, salt), Is.True);
+            Assert.That(PasswordUtility.VerifyPassword(hashPassword, password, salt), Is.True);
 
-            Assert.That(PasswordUtility.VerifyPassword(PasswordUtility.HashPassword(PasswordUtility.SaltPassword(password, salt)), "notmypassword", salt), Is.False);
+            Assert.That(PasswordUtility.VerifyPassword(hashPassword, "notmypassword", salt), Is.False);
         }
     }
 }
