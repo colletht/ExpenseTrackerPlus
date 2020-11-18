@@ -42,6 +42,8 @@
     <Reference Include="Microsoft.Data.Sqlite, Version=3.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Sqlite.Core.3.1.8\lib\netstandard2.0\Microsoft.Data.Sqlite.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="QRCoder, Version=1.3.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\QRCoder.1.3.5\lib\net40\QRCoder.dll</HintPath>
     </Reference>
@@ -84,14 +86,9 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddEditExpenseUserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="AddEditExpenseUserControl.Designer.cs">
-      <DependentUpon>AddEditExpenseUserControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="ExpenseForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -103,6 +100,12 @@
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddEditExpenseDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddEditExpenseDialog.Designer.cs">
+      <DependentUpon>AddEditExpenseDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -124,14 +127,14 @@
     <Compile Include="UserLoginForm.Designer.cs">
       <DependentUpon>UserLoginForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AddEditExpenseUserControl.resx">
-      <DependentUpon>AddEditExpenseUserControl.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="ExpenseForm.resx">
       <DependentUpon>ExpenseForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddEditExpenseDialog.resx">
+      <DependentUpon>AddEditExpenseDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

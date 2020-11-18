@@ -130,6 +130,27 @@ namespace ExpenseTracker
             this.loginErrorMessageTextBox.Visible = false;
         }
 
+        /// <summary>
+        /// Resets the form to initial state.
+        /// </summary>
+        private void ResetForm()
+        {
+            this.googleAuthenticatorUserControl.ResetForm();
+            this.HideGoogleAuthenticator();
+
+            // Clear authenticator for new use.
+            this.authenticator = new Authenticator();
+
+            this.HideLoginErrorMessage();
+            this.HideNewAccountErrorMessage();
+
+            this.usernameInputTextBox.Text = string.Empty;
+            this.newUsernameInputTextBox.Text = string.Empty;
+            this.passwordInputTextBox.Text = string.Empty;
+            this.newPasswordInputTextBox.Text = string.Empty;
+            this.confirmPasswordInputTextBox.Text = string.Empty;
+        }
+
         private void UserLoginForm_Load(object sender, EventArgs e)
         {
             this.usernameInputTextBox.Focus();
@@ -142,7 +163,6 @@ namespace ExpenseTracker
         /// <param name="e">Arguments passed with the event.</param>
         private void confirmAuthenticatorCode_Click(object sender, EventArgs e)
         {
-            Console.WriteLine(this.googleAuthenticatorUserControl.AuthenticatorCode);
             if (!this.authenticator.AuthenticateGoogleAuthenticator(this.googleAuthenticatorUserControl.AuthenticatorCode))
             {
                 // do error state: incorrect code entered.
@@ -159,13 +179,7 @@ namespace ExpenseTracker
             expenseForm.Show();
             this.Hide();
 
-            this.HideGoogleAuthenticator();
-
-            // Clear authenticator for new use.
-            this.authenticator = new Authenticator();
-
-            this.HideLoginErrorMessage();
-            this.HideNewAccountErrorMessage();
+            this.ResetForm();
         }
 
         /// <summary>

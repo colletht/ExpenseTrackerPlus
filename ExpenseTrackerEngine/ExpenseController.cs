@@ -42,10 +42,6 @@ namespace ExpenseTrackerEngine
 
             // Initially load all expenses into controller
             this.currentExpenses = this.ExpenseDataAccess.GetAll();
-            foreach (Expense e in this.currentExpenses)
-            {
-                e.PropertyChanged += this.OnExpensePropertyChanged;
-            }
         }
 
         /// <summary>
@@ -227,6 +223,8 @@ namespace ExpenseTrackerEngine
 
                 return retVal;
             });
+
+            this.ControllerDataRefreshed?.Invoke(this, null);
         }
 
         /// <summary>
@@ -257,18 +255,36 @@ namespace ExpenseTrackerEngine
         }
 
         /// <summary>
-        /// Deletes the Expense indicated by index in the database. Triggers
-        /// <see cref="ControllerDataRefreshed"/> event which reloads data from database.
+        /// Updates the expense with the given values. Triggers
+        /// <see cref="ControllerDataRefreshed"/> event which reloads data
+        /// from database.
         /// </summary>
-        /// <param name="index">index of the expense in the list.</param>
-        public void DeleteExpense(int index)
+        /// <param name="e">The expense to edit.</param>
+        public void EditExpense(Expense e)
         {
-            if (index < 0 || index >= this.CurrentExpensesCount)
+            if (e.Id < 0)
             {
                 throw new ArgumentOutOfRangeException();
             }
 
-            this.ExpenseDataAccess.DeleteRecord(this.currentExpenses[index].Id);
+            this.ExpenseDataAccess.UpdateRecord(e);
+
+            this.RefreshExpenses();
+        }
+
+        /// <summary>
+        /// Deletes the Expense indicated by index in the database. Triggers
+        /// <see cref="ControllerDataRefreshed"/> event which reloads data from database.
+        /// </summary>
+        /// <param name="e">Expense to delete.</param>
+        public void DeleteExpense(Expense e)
+        {
+            if (e.Id < 0)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            this.ExpenseDataAccess.DeleteRecord(e.Id);
 
             this.RefreshExpenses();
         }
@@ -288,7 +304,7 @@ namespace ExpenseTrackerEngine
         /// <returns>Float representing sum of expense values.</returns>
         public float ComputeNetSum()
         {
-            return this.currentExpenses.Aggregate(0, (float acc, Expense e) => e.Value);
+            return this.currentExpenses.Aggregate(0, (float acc, Expense e) => acc + e.Value);
         }
 
         /// <summary>
@@ -350,24 +366,7 @@ namespace ExpenseTrackerEngine
                 this.currentExpenses = this.ExpenseDataAccess.GetAll();
             }
 
-            // Reassign the listeners for the new expenses.
-            foreach (Expense e in this.currentExpenses)
-            {
-                e.PropertyChanged += this.OnExpensePropertyChanged;
-            }
-
             this.ControllerDataRefreshed?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentExpensesCount)));
-        }
-
-        /// <summary>
-        /// Fires any time an Expense has been modified, and consequently writes its value back to the database.
-        /// </summary>
-        /// <param name="sender">Expense that triggered the event.</param>
-        /// <param name="e">The properties that were changed.</param>
-        private void OnExpensePropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            // Update the record in the database.
-            this.ExpenseDataAccess.UpdateRecord(sender as Expense);
         }
     }
 }

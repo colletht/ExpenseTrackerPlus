@@ -76,6 +76,14 @@ namespace ExpenseTracker
         }
 
         /// <summary>
+        /// Resets the form to its initial state.
+        /// </summary>
+        public void ResetForm()
+        {
+            this.authenticatorCodeInputMaskedTextBox.Text = string.Empty;
+        }
+
+        /// <summary>
         /// Fires when the confirmCodeButton is clicked.
         /// </summary>
         /// <param name="sender">Object that registered the event (button).</param>
