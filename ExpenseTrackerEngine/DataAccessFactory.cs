@@ -166,7 +166,6 @@ namespace ExpenseTrackerEngine
 
                     DataAccessFactory.PrepareColValueCommand(cmdText, cmd, expense);
 
-                    Console.WriteLine(cmd.CommandText);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -308,15 +307,11 @@ namespace ExpenseTrackerEngine
 
                     DataAccessFactory.PrepareFilterConstraintCommand(cmdText, cmd, filter);
 
-                    Console.WriteLine(cmd.CommandText);
-
                     using (SqliteDataReader rdr = cmd.ExecuteReader())
                     {
                         while (rdr.Read())
                         {
                             Expense e = DataAccessFactory.FromRow(rdr);
-
-                            Console.WriteLine(e);
                             expenses.Add(e);
                         }
                     }
@@ -511,8 +506,6 @@ namespace ExpenseTrackerEngine
         /// <returns>an expense object.</returns>
         private static Expense FromRow(SqliteDataReader rdr)
         {
-            Console.WriteLine(rdr);
-
             Expense e = new Expense(
                 rdr.GetInt32(0),                                    // Id
                 (float)rdr.GetDecimal(1),                           // Value
@@ -558,7 +551,7 @@ namespace ExpenseTrackerEngine
         {
             SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
             builder.DataSource = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" + this.user.DocumentName + ".db";
-            builder.Password = "mypassword";
+            builder.Password = this.user.SecretKey;
 
             return builder.ConnectionString;
         }

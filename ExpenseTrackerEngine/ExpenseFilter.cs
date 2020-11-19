@@ -327,17 +327,17 @@ namespace ExpenseTrackerEngine
         /// <summary>
         /// Gets the <see cref="HashSet{T}"/> for matching place.
         /// </summary>
-        public HashSet<string> Place { get; }
+        public HashSet<string> Place { get; set; }
 
         /// <summary>
         /// Gets the <see cref="HashSet{T}"/> for matching tags.
         /// </summary>
-        public HashSet<string> Tag { get; }
+        public HashSet<string> Tag { get; set; }
 
         /// <summary>
         /// Gets the <see cref="HashSet{T}"/> for matching keywords in the notes.
         /// </summary>
-        public HashSet<string> Keywords { get; }
+        public HashSet<string> Keywords { get; set; }
 
         /// <summary>
         /// Gets or Sets the PurchaseMethod being used to match.

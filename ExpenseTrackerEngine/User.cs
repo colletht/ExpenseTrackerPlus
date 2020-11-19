@@ -6,6 +6,7 @@ namespace ExpenseTrackerEngine
 {
     using System;
     using System.Collections.Generic;
+    using System.Configuration;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -255,7 +256,13 @@ namespace ExpenseTrackerEngine
         {
             SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
             builder.DataSource = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" + MetaDataFileName + ".db";
-            builder.Password = "mypassword";
+            builder.Password = ConfigurationManager.AppSettings["password"];
+
+            if (string.IsNullOrWhiteSpace(builder.Password))
+            {
+                throw new Exception("Fatal: Could not obtain application credentials. Without credentials the application cannot be used.");
+            }
+
             builder.Mode = SqliteOpenMode.ReadWriteCreate;
 
             return builder.ConnectionString;

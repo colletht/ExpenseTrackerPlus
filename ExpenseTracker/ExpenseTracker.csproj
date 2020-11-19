@@ -39,6 +39,12 @@
     <Reference Include="Google.Authenticator, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\GoogleAuthenticator.2.0.1\lib\net45\Google.Authenticator.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Configuration.ConfigurationBuilders.Base, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Configuration.ConfigurationBuilders.Base.2.0.0\lib\Net471\Microsoft.Configuration.ConfigurationBuilders.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Configuration.ConfigurationBuilders.UserSecrets, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Configuration.ConfigurationBuilders.UserSecrets.2.0.0\lib\Net471\Microsoft.Configuration.ConfigurationBuilders.UserSecrets.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Data.Sqlite, Version=3.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Sqlite.Core.3.1.8\lib\netstandard2.0\Microsoft.Data.Sqlite.dll</HintPath>
     </Reference>
@@ -89,6 +95,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddEditFilterDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddEditFilterDialog.Designer.cs">
+      <DependentUpon>AddEditFilterDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="ExpenseForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -109,12 +121,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AddEditFilterUserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="AddEditFilterUserControl.Designer.cs">
-      <DependentUpon>AddEditFilterUserControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="GoogleAuthenticatorUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -127,6 +133,9 @@
     <Compile Include="UserLoginForm.Designer.cs">
       <DependentUpon>UserLoginForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AddEditFilterDialog.resx">
+      <DependentUpon>AddEditFilterDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ExpenseForm.resx">
       <DependentUpon>ExpenseForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -145,9 +154,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AddEditFilterUserControl.resx">
-      <DependentUpon>AddEditFilterUserControl.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="GoogleAuthenticatorUserControl.resx">
       <DependentUpon>GoogleAuthenticatorUserControl.cs</DependentUpon>
     </EmbeddedResource>

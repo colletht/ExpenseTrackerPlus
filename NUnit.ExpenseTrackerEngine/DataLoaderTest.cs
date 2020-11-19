@@ -537,7 +537,7 @@ namespace NUnit.ExpenseTrackerEngineTest
         {
             SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder();
             builder.DataSource = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" + this.testUser.DocumentName + ".db";
-            builder.Password = "mypassword";
+            builder.Password = this.testUser.SecretKey;
 
             return builder.ConnectionString;
         }

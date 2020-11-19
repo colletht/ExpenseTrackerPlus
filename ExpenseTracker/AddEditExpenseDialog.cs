@@ -28,6 +28,7 @@ namespace ExpenseTracker
         public AddEditExpenseDialog()
         {
             this.InitializeComponent();
+            this.Expense = null;
 
             // Set title to Add
             this.titleTextBox.Text = "Add a New Expense";
@@ -43,6 +44,7 @@ namespace ExpenseTracker
         public AddEditExpenseDialog(Expense e)
         {
             this.InitializeComponent();
+            this.Expense = e;
 
             // Set title to Edit
             this.titleTextBox.Text = "Edit an Existing Expense";
@@ -354,13 +356,25 @@ namespace ExpenseTracker
                     throw new InvalidEnumArgumentException("Error: unhandled purchase method passed");
             }
 
-            this.Expense = new Expense(
-                float.Parse(this.amountInputTextBox.Text),
-                this.dateTimePicker.Value,
-                this.placeInputTextBox.Text.Trim(),
-                p,
-                new HashSet<string>(from string tag in this.tagInputTextBox.Text.Split(',') select tag.Trim()),
-                this.notesInputTextBox.Text.Trim());
+            if (this.Expense == null)
+            {
+                this.Expense = new Expense(
+                    float.Parse(this.amountInputTextBox.Text),
+                    this.dateTimePicker.Value,
+                    this.placeInputTextBox.Text.Trim(),
+                    p,
+                    new HashSet<string>(from string tag in this.tagInputTextBox.Text.Split(',') select tag.Trim()),
+                    this.notesInputTextBox.Text.Trim());
+            }
+            else
+            {
+                this.Expense.Value = float.Parse(this.amountInputTextBox.Text);
+                this.Expense.Date = this.dateTimePicker.Value;
+                this.Expense.Place = this.placeInputTextBox.Text.Trim();
+                this.Expense.Method = p;
+                this.Expense.Tag = new HashSet<string>(from string tag in this.tagInputTextBox.Text.Split(',') select tag.Trim());
+                this.Expense.Notes = this.notesInputTextBox.Text.Trim();
+            }
 
             // Set the ok result and close the form.
             this.DialogResult = DialogResult.OK;

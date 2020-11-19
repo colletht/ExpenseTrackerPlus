@@ -308,10 +308,10 @@ namespace ExpenseTracker
                 // new user setup succesful. proceed to google auth screen.
                 this.ShowGoogleAuthenticator();
             }
-            catch
+            catch (Exception err)
             {
                 // do error state: username already exists in database
-                this.ShowNewAccountErrorMessage("Profile creation failed: That username already exists in our database. Try a different one!");
+                this.ShowNewAccountErrorMessage(err.Message);
                 return;
             }
         }

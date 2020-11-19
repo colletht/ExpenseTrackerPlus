@@ -129,11 +129,11 @@ namespace ExpenseTracker
         /// <param name="e">Expense the button was clicked for.</param>
         private void editButton_Click(Expense e)
         {
-            AddEditExpenseDialog addDialog = new AddEditExpenseDialog(e);
+            AddEditExpenseDialog editDialog = new AddEditExpenseDialog(e);
 
-            if (addDialog.ShowDialog() == DialogResult.OK)
+            if (editDialog.ShowDialog() == DialogResult.OK)
             {
-                this.controller.EditExpense(e);
+                this.controller.EditExpense(editDialog.Expense);
             }
         }
 
@@ -207,7 +207,6 @@ namespace ExpenseTracker
             {
                 if (e.ColumnIndex == 6)
                 {
-                    Console.WriteLine(e.RowIndex);
                     this.editButton_Click(this.controller.GetExpense(e.RowIndex));
                 }
                 else if (e.ColumnIndex == 7)
@@ -215,6 +214,17 @@ namespace ExpenseTracker
                     this.deleteButton_Click(this.controller.GetExpense(e.RowIndex));
                 }
 
+            }
+        }
+
+        private void setCurrentFilterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AddEditFilterDialog addDialog = new AddEditFilterDialog();
+
+            if (addDialog.ShowDialog() == DialogResult.OK)
+            {
+                this.controller.ActiveFilter = addDialog.ExpenseFilter;
+                this.DisplayFilterNameTextBox.Text = addDialog.ExpenseFilter.Name;
             }
         }
     }

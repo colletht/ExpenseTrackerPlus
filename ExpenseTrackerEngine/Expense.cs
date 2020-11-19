@@ -179,11 +179,12 @@ namespace ExpenseTrackerEngine
         }
 
         /// <summary>
-        /// Gets tags categorizing expense.
+        /// Gets or sets tags categorizing expense.
         /// </summary>
         public HashSet<string> Tag
         {
             get { return this.tag; }
+            set { this.tag = value; }
         }
 
         /// <summary>
