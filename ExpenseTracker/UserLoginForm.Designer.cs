@@ -89,7 +89,7 @@
             this.usernameLabelTextBox.ReadOnly = true;
             this.usernameLabelTextBox.Size = new System.Drawing.Size(276, 23);
             this.usernameLabelTextBox.TabIndex = 4;
-            this.usernameLabelTextBox.Text = "Email:";
+            this.usernameLabelTextBox.Text = "Username:";
             // 
             // passwordLabelTextBox
             // 

@@ -51,6 +51,17 @@ namespace ExpenseTracker
             return rg.IsMatch(username);
         }
 
+        private bool PasswordIsValid(string password)
+        {
+            if (password.Length < 10 || password.Length > 20)
+            {
+                return false;
+            }
+
+            Regex rg = new Regex(@"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)");
+            return rg.IsMatch(password);
+        }
+
         /// <summary>
         /// Makes the google authenticator input usercontrol visible and hides everything else.
         /// </summary>
@@ -276,17 +287,10 @@ namespace ExpenseTracker
                 return;
             }
 
-            if (this.newPasswordInputTextBox.Text.Length == 0)
+            if (!this.PasswordIsValid(this.newPasswordInputTextBox.Text))
             {
                 // do error state: new password is empty
-                this.ShowNewAccountErrorMessage("You forgot to enter your password!");
-                return;
-            }
-
-            if (this.confirmPasswordInputTextBox.Text.Length == 0)
-            {
-                // do error state: confirm password is empty
-                this.ShowNewAccountErrorMessage("You forgot to enter your password confirmation!");
+                this.ShowNewAccountErrorMessage("Password must be between 10 and 20 characters, and have at least 1 lowercasee, uppercase, number, and special symbol.");
                 return;
             }
 
