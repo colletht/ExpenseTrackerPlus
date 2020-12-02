@@ -65,7 +65,8 @@ namespace ExpenseTracker
         /// <summary>
         /// Makes the google authenticator input usercontrol visible and hides everything else.
         /// </summary>
-        private void ShowGoogleAuthenticator()
+        /// <param name="newUser">True if showing for a new user.</param>
+        private void ShowGoogleAuthenticator(bool newUser = false)
         {
             this.authenticator.SetUpGoogleAuthenticator();
 
@@ -79,7 +80,12 @@ namespace ExpenseTracker
             // Set google auth control to enabled and visible.
             this.googleAuthenticatorUserControl.Enabled = true;
             this.googleAuthenticatorUserControl.Visible = true;
-            this.googleAuthenticatorUserControl.SetQrCodeImage(this.authenticator.QRCodeImageURL);
+
+            if (newUser)
+            {
+                this.googleAuthenticatorUserControl.SetQrCodeImage(this.authenticator.QRCodeImageURL);
+                this.googleAuthenticatorUserControl.ShowQrCode();
+            }
         }
 
         /// <summary>
@@ -310,7 +316,7 @@ namespace ExpenseTracker
                 this.HideNewAccountErrorMessage();
 
                 // new user setup succesful. proceed to google auth screen.
-                this.ShowGoogleAuthenticator();
+                this.ShowGoogleAuthenticator(true);
             }
             catch (Exception err)
             {

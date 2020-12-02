@@ -26,6 +26,7 @@ namespace ExpenseTracker
         public GoogleAuthenticatorUserControl()
         {
             this.InitializeComponent();
+            this.HideQrCode();
         }
 
         /// <summary>
@@ -73,6 +74,22 @@ namespace ExpenseTracker
             this.errorMessageTextBox.Text = string.Empty;
             this.errorMessageTextBox.Enabled = false;
             this.errorMessageTextBox.Visible = false;
+        }
+
+        public void ShowQrCode()
+        {
+            this.qrCodePictureBox.Enabled = true;
+            this.qrCodePictureBox.Visible = true;
+            this.authenticatorInstructionTextBox.Enabled = true;
+            this.authenticatorInstructionTextBox.Visible = true;
+        }
+
+        public void HideQrCode()
+        {
+            this.qrCodePictureBox.Enabled = false;
+            this.qrCodePictureBox.Visible = false;
+            this.authenticatorInstructionTextBox.Enabled = false;
+            this.authenticatorInstructionTextBox.Visible = false;
         }
 
         /// <summary>

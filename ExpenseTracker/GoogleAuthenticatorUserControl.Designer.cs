@@ -43,7 +43,7 @@
             // authenticatorLabelTextBox
             // 
             this.authenticatorLabelTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.authenticatorLabelTextBox.Location = new System.Drawing.Point(209, 86);
+            this.authenticatorLabelTextBox.Location = new System.Drawing.Point(208, 40);
             this.authenticatorLabelTextBox.Name = "authenticatorLabelTextBox";
             this.authenticatorLabelTextBox.ReadOnly = true;
             this.authenticatorLabelTextBox.Size = new System.Drawing.Size(201, 23);
@@ -55,7 +55,7 @@
             this.authenticatorCodeInputMaskedTextBox.AllowPromptAsInput = false;
             this.authenticatorCodeInputMaskedTextBox.CutCopyMaskFormat = System.Windows.Forms.MaskFormat.ExcludePromptAndLiterals;
             this.authenticatorCodeInputMaskedTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.authenticatorCodeInputMaskedTextBox.Location = new System.Drawing.Point(209, 185);
+            this.authenticatorCodeInputMaskedTextBox.Location = new System.Drawing.Point(208, 139);
             this.authenticatorCodeInputMaskedTextBox.Mask = "0-0-0-0-0-0";
             this.authenticatorCodeInputMaskedTextBox.Name = "authenticatorCodeInputMaskedTextBox";
             this.authenticatorCodeInputMaskedTextBox.Size = new System.Drawing.Size(201, 53);
@@ -67,7 +67,7 @@
             // 
             this.authenticatorLogoPictureBox.BackColor = System.Drawing.SystemColors.Control;
             this.authenticatorLogoPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("authenticatorLogoPictureBox.Image")));
-            this.authenticatorLogoPictureBox.Location = new System.Drawing.Point(278, 115);
+            this.authenticatorLogoPictureBox.Location = new System.Drawing.Point(277, 69);
             this.authenticatorLogoPictureBox.Name = "authenticatorLogoPictureBox";
             this.authenticatorLogoPictureBox.Size = new System.Drawing.Size(64, 64);
             this.authenticatorLogoPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -76,7 +76,7 @@
             // 
             // confirmCodeButton
             // 
-            this.confirmCodeButton.Location = new System.Drawing.Point(209, 244);
+            this.confirmCodeButton.Location = new System.Drawing.Point(208, 198);
             this.confirmCodeButton.Name = "confirmCodeButton";
             this.confirmCodeButton.Size = new System.Drawing.Size(201, 23);
             this.confirmCodeButton.TabIndex = 5;
@@ -109,7 +109,7 @@
             // 
             this.errorMessageTextBox.Enabled = false;
             this.errorMessageTextBox.ForeColor = System.Drawing.Color.Red;
-            this.errorMessageTextBox.Location = new System.Drawing.Point(210, 274);
+            this.errorMessageTextBox.Location = new System.Drawing.Point(209, 228);
             this.errorMessageTextBox.Multiline = true;
             this.errorMessageTextBox.Name = "errorMessageTextBox";
             this.errorMessageTextBox.ReadOnly = true;
