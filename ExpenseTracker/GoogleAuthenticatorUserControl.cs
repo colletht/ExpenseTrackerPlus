@@ -98,6 +98,7 @@ namespace ExpenseTracker
         public void ResetForm()
         {
             this.authenticatorCodeInputMaskedTextBox.Text = string.Empty;
+            this.HideQrCode();
         }
 
         /// <summary>
